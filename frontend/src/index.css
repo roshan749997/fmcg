@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+/* Prevent horizontal scrolling */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure all elements respect their container's width */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure sticky positioning works correctly */
+#root {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Prevent parent containers from breaking sticky positioning */
+main {
+  overflow-x: hidden;
+  overflow-y: visible;
+  position: relative;
+}
+
+/* Ensure sticky elements work in flex containers */
+.flex {
+  min-height: 0;
+}
