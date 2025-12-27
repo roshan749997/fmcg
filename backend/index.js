@@ -45,7 +45,8 @@ server.set('trust proxy', 1);
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 server.use(
   cors({
-    origin: [frontendUrl, 'http://localhost:5173', 'http://localhost:5174'],
+    origin: [frontendUrl,"https://www.kidzfa.in",
+    "https://kidzfa.in", 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
