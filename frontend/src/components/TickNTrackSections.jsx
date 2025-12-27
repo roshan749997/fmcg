@@ -199,7 +199,7 @@ const KidzoSections = () => {
                   <img
                     src={offer.image}
                     alt={offer.badge}
-                    className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'https://via.placeholder.com/600/1F2937/FFFFFF?text=Offer';
@@ -207,7 +207,7 @@ const KidzoSections = () => {
                   />
                 </div>
                 <div className="relative p-4 sm:p-5 md:p-6 text-white z-10">
-                  <div className={`inline-block ${offer.badgeClass || 'bg-white/20'} backdrop-blur-sm px-3 py-1 rounded-full mb-2`}>
+                  <div className={`inline-block ${offer.badgeClass || 'bg-white/20'} px-3 py-1 rounded-full mb-2`}>
                     <span className="text-xs font-bold uppercase tracking-wider">{offer.badge}</span>
                     </div>
                   <div className="text-3xl sm:text-4xl md:text-5xl font-black mb-1 leading-none">{offer.title}</div>
@@ -218,7 +218,7 @@ const KidzoSections = () => {
                     {offer.buttonText}
                       </button>
                     </div>
-                <div className="absolute top-4 right-4 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
+                <div className="absolute top-4 right-4 w-20 h-20 bg-white/10 rounded-full"></div>
               </div>
             ))}
           </div>
