@@ -118,7 +118,30 @@ const Navbar = () => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const authenticated = Boolean(token);
+        let authenticated = Boolean(token);
+        
+        // If no token in localStorage, check for cookie-based auth (e.g., Google OAuth)
+        if (!authenticated) {
+          try {
+            const { api } = await import('../utils/api');
+            const data = await api.me();
+            if (data?.user) {
+              // Cookie auth detected - set localStorage markers
+              authenticated = true;
+              localStorage.setItem('auth_token', 'cookie');
+              if (data.user.isAdmin) {
+                localStorage.setItem('auth_is_admin', 'true');
+              } else {
+                localStorage.removeItem('auth_is_admin');
+              }
+              localStorage.setItem('user_data', JSON.stringify({ user: data.user }));
+            }
+          } catch (err) {
+            // No cookie auth - user is not authenticated
+            authenticated = false;
+          }
+        }
+        
         setIsAuthenticated(authenticated);
         
         if (authenticated) {

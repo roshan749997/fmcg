@@ -41,12 +41,19 @@ const server = express();
 // When behind proxy (Render)
 server.set('trust proxy', 1);
 
-// CORS configuration
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+// CORS configuration - Allow all frontend URLs
+const frontendUrls = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://kidzfa.onrender.com',
+  'https://www.kidzfa.in',
+  'https://kidzfa.in',
+].filter(Boolean); // Remove any undefined/null values
+
 server.use(
   cors({
-    origin: [frontendUrl,"https://www.kidzfa.in",
-    "https://kidzfa.in", 'http://localhost:5173', 'http://localhost:5174'],
+    origin: frontendUrls,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
