@@ -252,9 +252,49 @@ export async function adminListProducts(req, res) {
 export async function deleteProductById(req, res) {
   try {
     const { id } = req.params;
-    await Product.findByIdAndDelete(id);
-    return res.json({ message: 'Deleted' });
+    
+    if (!id) {
+      return res.status(400).json({ message: 'Product ID is required' });
+    }
+    
+    // Convert to string if it's an ObjectId
+    const idString = id.toString ? id.toString() : id;
+    
+    // Try to find and delete from all collections
+    const collections = [
+      { model: Product, name: 'Product' },
+      { model: KidsClothing, name: 'KidsClothing' },
+      { model: Footwear, name: 'Footwear' },
+      { model: KidsAccessories, name: 'KidsAccessories' },
+      { model: BabyCare, name: 'BabyCare' },
+      { model: Toys, name: 'Toys' },
+    ];
+    
+    let deleted = false;
+    let deletedFrom = null;
+    
+    for (const { model, name } of collections) {
+      try {
+        const product = await model.findByIdAndDelete(idString);
+        if (product) {
+          deleted = true;
+          deletedFrom = name;
+          console.log(`[deleteProductById] Product deleted from ${name} collection`);
+          break; // Found and deleted, no need to check other collections
+        }
+      } catch (err) {
+        console.error(`[deleteProductById] Error checking ${name}:`, err.message);
+        // Continue to next collection
+      }
+    }
+    
+    if (deleted) {
+      return res.json({ message: 'Product deleted successfully', deletedFrom });
+    } else {
+      return res.status(404).json({ message: 'Product not found in any collection' });
+    }
   } catch (err) {
+    console.error('[deleteProductById] Error:', err);
     return res.status(500).json({ message: 'Failed to delete product', error: err.message });
   }
 }
