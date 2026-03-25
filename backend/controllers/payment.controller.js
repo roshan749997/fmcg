@@ -4,11 +4,6 @@ import Cart from '../models/Cart.js';
 import Order from '../models/Order.js';
 import { Address } from '../models/Address.js';
 import { Product } from '../models/product.js';
-import { KidsClothing } from '../models/KidsClothing.js';
-import { Footwear } from '../models/Footwear.js';
-import { KidsAccessories } from '../models/KidsAccessories.js';
-import { BabyCare } from '../models/BabyCare.js';
-import { Toys } from '../models/Toys.js';
 
 const getClient = () => {
   const key_id = process.env.RAZORPAY_KEY_ID || '';
@@ -103,10 +98,10 @@ export const verifyPayment = async (req, res) => {
 
     console.log('[verifyPayment] Cart items count:', cart.items.length);
 
-    // Manually populate products from all collections
+    // Populate products from unified collection
     const items = await Promise.all(
       cart.items.map(async (i) => {
-        const product = await findProductInAllCollections(i.product);
+        const product = await findProductById(i.product);
         if (!product) {
           console.error('[verifyPayment] Product not found:', i.product);
           throw new Error(`Product ${i.product} not found`);
@@ -167,28 +162,9 @@ export const verifyPayment = async (req, res) => {
   }
 };
 
-// Helper function to find product in any collection (used by both verifyPayment and createCodOrder)
-async function findProductInAllCollections(productId) {
-  const collections = [
-    { model: Product, name: 'Product' },
-    { model: KidsClothing, name: 'KidsClothing' },
-    { model: Footwear, name: 'Footwear' },
-    { model: KidsAccessories, name: 'KidsAccessories' },
-    { model: BabyCare, name: 'BabyCare' },
-    { model: Toys, name: 'Toys' },
-  ];
-
-  for (const { model } of collections) {
-    try {
-      const product = await model.findById(productId);
-      if (product) {
-        return product;
-      }
-    } catch (err) {
-      // Continue to next collection
-    }
-  }
-  return null;
+// Helper function to find product in unified collection
+async function findProductById(productId) {
+  return Product.findById(productId);
 }
 
 export const createCodOrder = async (req, res) => {
@@ -201,10 +177,10 @@ export const createCodOrder = async (req, res) => {
       return res.status(400).json({ error: 'Cart is empty' });
     }
 
-    // Manually populate products from all collections
+    // Populate products from unified collection
     const items = await Promise.all(
       cart.items.map(async (i) => {
-        const product = await findProductInAllCollections(i.product);
+        const product = await findProductById(i.product);
         if (!product) {
           throw new Error(`Product ${i.product} not found`);
         }

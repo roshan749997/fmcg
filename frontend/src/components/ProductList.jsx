@@ -5,6 +5,7 @@ import { fetchSarees } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
 import ScrollToTop from './ScrollToTop';
 import { useHeaderColor } from '../utils/useHeaderColor';
+import { categoryTree, slugifyCategory } from '../data/categoryTree';
 
 // Add CSS to hide scrollbar and loading animation
 const styles = `
@@ -35,18 +36,19 @@ const styles = `
     animation: slide-in-from-right 0.3s ease-out;
   }
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 0;
+    height: 0;
+    display: none;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
+    display: none;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #000000;
-    border-radius: 10px;
+    display: none;
   }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #000000;
+  .custom-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
   /* Ensure sticky positioning works */
   .filter-sticky-container {
@@ -79,9 +81,6 @@ const ProductList = ({ defaultCategory } = {}) => {
   const loadMoreRef = useRef(null);
   
   // Filter states
-  const [selectedPriceRange, setSelectedPriceRange] = useState(null);
-  const [customPriceFrom, setCustomPriceFrom] = useState('');
-  const [customPriceTo, setCustomPriceTo] = useState('');
   const [selectedFabrics, setSelectedFabrics] = useState([]);
   
   // Product-specific filter states
@@ -113,6 +112,20 @@ const ProductList = ({ defaultCategory } = {}) => {
     const t = s.replace(/-/g, ' ').toLowerCase();
     return t.replace(/\b\w/g, (c) => c.toUpperCase());
   };
+
+  const categoryNavContext = React.useMemo(() => {
+    const currentMainSlug = slugifyCategory(mainCategory || categoryName || '');
+    const mainNode = categoryTree.find((main) => slugifyCategory(main.name) === currentMainSlug);
+    if (!mainNode) return { mainNode: null, activeSubNode: null, sidebarItems: [] };
+
+    const currentSubSlug = slugifyCategory(mainCategory ? categoryName : subCategoryName || '');
+    const activeSubNode = mainNode.subcategories.find((sub) => slugifyCategory(sub.name) === currentSubSlug) || null;
+    return {
+      mainNode,
+      activeSubNode,
+      sidebarItems: activeSubNode?.items || [],
+    };
+  }, [mainCategory, categoryName, subCategoryName]);
 
   // Handle 3-segment paths: /category/shoes/mens-shoes/sports-shoes
   // Calculate effectiveCategory and effectiveSubCategory
@@ -355,18 +368,6 @@ const ProductList = ({ defaultCategory } = {}) => {
     return Array.from(fabricSet).sort();
   }, [products, isShoesCategory, isWatchCategory]);
   
-  const priceRanges = [
-    { id: 1, label: '₹100 – ₹200', min: 100, max: 200 },
-    { id: 2, label: '₹201 – ₹300', min: 201, max: 300 },
-    { id: 3, label: '₹301 – ₹400', min: 301, max: 400 },
-    { id: 4, label: '₹401 – ₹500', min: 401, max: 500 },
-    { id: 5, label: '₹501 – ₹600', min: 501, max: 600 },
-    { id: 6, label: '₹601 – ₹700', min: 601, max: 700 },
-    { id: 7, label: '₹701 – ₹800', min: 701, max: 800 },
-    { id: 8, label: '₹801 – ₹900', min: 801, max: 900 },
-    { id: 9, label: '₹901 – ₹1,000', min: 901, max: 1000 },
-  ];
-  
   // Fetch products
   useEffect(() => {
     const load = async () => {
@@ -378,20 +379,42 @@ const ProductList = ({ defaultCategory } = {}) => {
         setFilteredProducts([]);
         setDisplayCount(20); // Reset to initial 20 products when category changes
         
-        // Use subcategory if available, otherwise use category
-        // Convert to lowercase with hyphens for API endpoint matching
-        const apiCategory = effectiveCategory ? effectiveCategory.toLowerCase().replace(/\s+/g, '-') : null;
-        const apiSubCategory = effectiveSubCategory || null;
+        // Build request params based on URL depth:
+        // 1-level: /category/:main
+        // 2-level: /category/:main/:sub
+        // 3-level: /category/:main/:sub/:leaf
+        let requestMainCategory = null;
+        let requestCategory = null;
+        let requestSubCategory = null;
+
+        if (mainCategory && categoryName && subCategoryName) {
+          // 3-level: main + sub + leaf
+          requestMainCategory = normalize(mainCategory);
+          requestCategory = normalize(categoryName).toLowerCase().replace(/\s+/g, '-');
+          requestSubCategory = normalize(subCategoryName);
+        } else if (categoryName && subCategoryName) {
+          // 2-level: main + sub (show ALL product types under this subcategory)
+          requestMainCategory = normalize(categoryName);
+          requestCategory = normalize(subCategoryName).toLowerCase().replace(/\s+/g, '-');
+          requestSubCategory = null;
+        } else if (categoryName) {
+          // 1-level: main only
+          requestMainCategory = normalize(categoryName);
+          requestCategory = null;
+          requestSubCategory = null;
+        }
         
         console.log('ProductList - Fetching products:', {
           effectiveCategory,
           effectiveSubCategory,
-          apiCategory,
-          apiSubCategory,
+          requestMainCategory,
+          requestCategory,
+          requestSubCategory,
+          mainCategory,
           categoryName,
           subCategoryName
         });
-        const data = await fetchSarees(apiCategory || effectiveCategory, apiSubCategory);
+        const data = await fetchSarees(requestCategory, requestSubCategory, requestMainCategory);
         console.log('ProductList - Received products:', data?.length || 0);
         setProducts(Array.isArray(data) ? data : []);
         setFilteredProducts(Array.isArray(data) ? data : []);
@@ -406,22 +429,11 @@ const ProductList = ({ defaultCategory } = {}) => {
     };
 
     load();
-  }, [effectiveCategory, effectiveSubCategory]);
+  }, [effectiveCategory, effectiveSubCategory, mainCategory, categoryName, subCategoryName]);
   
   // Apply filters
   useEffect(() => {
     let result = [...products];
-    
-    // Filter by price range (always available)
-    if (selectedPriceRange) {
-      const range = priceRanges.find(r => r.id === selectedPriceRange);
-      if (range) {
-        result = result.filter(p => {
-          const price = p.price || (p.mrp - p.mrp * ((p.discountPercent || 0) / 100));
-          return price >= range.min && price <= range.max;
-        });
-      }
-    }
     
     // Filter by brand (common for shoes and watches)
     if (selectedBrands.length > 0) {
@@ -524,7 +536,6 @@ const ProductList = ({ defaultCategory } = {}) => {
     setDisplayCount(20);
   }, [
     products, 
-    selectedPriceRange, 
     selectedFabrics, 
     selectedBrands,
     selectedShoeMaterials,
@@ -547,7 +558,6 @@ const ProductList = ({ defaultCategory } = {}) => {
   };
   
   const resetFilters = () => {
-    setSelectedPriceRange(null);
     setSelectedFabrics([]);
     setSelectedBrands([]);
     setSelectedShoeMaterials([]);
@@ -624,17 +634,40 @@ const ProductList = ({ defaultCategory } = {}) => {
     selectedWatchMovements.length,
     selectedWatchCaseMaterials.length,
     selectedWatchBandMaterials.length,
-    selectedWaterResistance.length,
-    selectedPriceRange ? 1 : 0
+    selectedWaterResistance.length
   ].reduce((a, b) => a + b, 0);
 
   const FilterContent = () => (
     <div className="space-y-6">
-      <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-        <h3 className="text-xl font-bold text-black flex items-center gap-2">
-          <FaFilter className="text-black" />
-          Filters
-        </h3>
+      {categoryNavContext.activeSubNode && categoryNavContext.sidebarItems.length > 0 && (
+        <div className="border-b border-gray-200 pb-6">
+          <h4 className="text-base font-semibold text-black mb-1">Select Product Type</h4>
+          <p className="text-xs text-gray-600 mb-3">Now choose an item under <span className="font-medium text-black">{categoryNavContext.activeSubNode.name}</span>.</p>
+          <div className="space-y-2.5 max-h-72 overflow-y-auto custom-scrollbar pr-2">
+            {categoryNavContext.sidebarItems.map((item) => {
+              const itemPath = `/category/${slugifyCategory(categoryNavContext.mainNode.name)}/${slugifyCategory(categoryNavContext.activeSubNode.name)}/${slugifyCategory(item)}`;
+              const isActiveItem = slugifyCategory(mainCategory ? subCategoryName : '') === slugifyCategory(item);
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => navigate(itemPath)}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${
+                    isActiveItem ? 'bg-gray-100 border border-gray-300 font-semibold text-black' : 'text-black border border-transparent hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{item}</span>
+                    {isActiveItem && <span className="text-xs text-gray-600">Active</span>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-end items-center pb-4 border-b border-gray-200">
         {activeFilterCount > 0 && (
           <button 
             onClick={resetFilters}
@@ -646,55 +679,6 @@ const ProductList = ({ defaultCategory } = {}) => {
         )}
       </div>
 
-      {/* Price Range Filter */}
-      <div className="border-b border-gray-200 pb-6">
-        <button
-          onClick={() => toggleSection('price')}
-          className="flex justify-between items-center w-full mb-4 group"
-        >
-          <h4 className="text-base font-semibold text-black transition-colors">Price Range</h4>
-          <div className="flex items-center gap-2">
-            {selectedPriceRange && (
-              <span className="inline-flex items-center justify-center h-5 w-5 bg-black text-white text-xs font-bold rounded-full">
-                ✓
-              </span>
-            )}
-            {openSections.price ? (
-              <FaChevronUp className="text-black transition-transform" />
-            ) : (
-              <FaChevronDown className="text-gray-400 group-hover:text-black transition-colors" />
-            )}
-          </div>
-        </button>
-        
-        {openSections.price && (
-          <div className="space-y-2.5">
-            {priceRanges.map(range => (
-              <div key={range.id} className="flex items-center group">
-                <input
-                  type="radio"
-                  id={`price-${range.id}`}
-                  name="priceRange"
-                  checked={selectedPriceRange === range.id}
-                  onChange={() => setSelectedPriceRange(range.id)}
-                  className="h-4 w-4 text-black focus:ring-black border-gray-300 cursor-pointer"
-                />
-                <label 
-                  htmlFor={`price-${range.id}`} 
-                  className={`ml-3 text-sm cursor-pointer flex-1 py-1.5 px-3 rounded-md transition-all ${
-                    selectedPriceRange === range.id 
-                      ? 'bg-gray-100 text-black font-medium' 
-                      : 'text-black hover:bg-gray-50'
-                  }`}
-                >
-                  {range.label}
-                </label>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      
       {/* Brand Filter (for Shoes and Watches) */}
       {(isShoesCategory || isWatchCategory) && availableBrands.length > 0 && (
         <div className="border-b border-gray-200 pb-6">
@@ -1255,33 +1239,6 @@ const ProductList = ({ defaultCategory } = {}) => {
               {/* Active Filters Pills */}
               {activeFilterCount > 0 && (
                 <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto">
-                  {selectedPriceRange && (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-black border border-black">
-                      {priceRanges.find(r => r.id === selectedPriceRange)?.label}
-                      <button 
-                        onClick={() => setSelectedPriceRange(null)}
-                        className="ml-1.5 hover:scale-110 transition-transform"
-                      >
-                        <FaTimes className="w-2.5 h-2.5" />
-                      </button>
-                    </span>
-                  )}
-                  
-                  {(customPriceFrom || customPriceTo) && (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-black border border-black">
-                      ₹{customPriceFrom || '0'}-₹{customPriceTo || '∞'}
-                      <button 
-                        onClick={() => {
-                          setCustomPriceFrom('');
-                          setCustomPriceTo('');
-                        }}
-                        className="ml-1.5 hover:scale-110 transition-transform"
-                      >
-                        <FaTimes className="w-2.5 h-2.5" />
-                      </button>
-                    </span>
-                  )}
-                  
                   {selectedBrands.map(brand => (
                     <span key={brand} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-black border border-black">
                       {brand}
@@ -1474,7 +1431,7 @@ const ProductList = ({ defaultCategory } = {}) => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-5 lg:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4 md:gap-5 lg:gap-6">
                   {filteredProducts.slice(0, displayCount).map((p) => (
                   <div
                     key={p._id || p.title}

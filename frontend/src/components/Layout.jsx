@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import MobileHeader from './MobileHeader';
 import Footer from './Footer';
 
 const Layout = () => {
+  const location = useLocation();
   const headerWrapRef = useRef(null);
   const mobileHeaderRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [navbarHeight, setNavbarHeight] = useState(0);
+  const hideFooter =
+    location.pathname.startsWith('/category/') ||
+    location.pathname.startsWith('/product/');
 
   useEffect(() => {
     const updateHeight = () => {
@@ -65,7 +69,7 @@ const Layout = () => {
       </main>
 
       {/* Footer */}
-      <Footer />
+      {!hideFooter && <Footer />}
     </div>
   );
 };

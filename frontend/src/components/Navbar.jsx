@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { searchProducts } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
+import { navbarCategories } from '../data/categoryTree';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -118,30 +119,7 @@ const Navbar = () => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        let authenticated = Boolean(token);
-        
-        // If no token in localStorage, check for cookie-based auth (e.g., Google OAuth)
-        if (!authenticated) {
-          try {
-            const { api } = await import('../utils/api');
-            const data = await api.me();
-            if (data?.user) {
-              // Cookie auth detected - set localStorage markers
-              authenticated = true;
-              localStorage.setItem('auth_token', 'cookie');
-              if (data.user.isAdmin) {
-                localStorage.setItem('auth_is_admin', 'true');
-              } else {
-                localStorage.removeItem('auth_is_admin');
-              }
-              localStorage.setItem('user_data', JSON.stringify({ user: data.user }));
-            }
-          } catch (err) {
-            // No cookie auth - user is not authenticated
-            authenticated = false;
-          }
-        }
-        
+        const authenticated = Boolean(token);
         setIsAuthenticated(authenticated);
         
         if (authenticated) {
@@ -326,48 +304,7 @@ const Navbar = () => {
   }, []);
 
   // Categories with subcategories
-  const categories = [
-    {
-      name: "KIDS CLOTHING",
-      path: '/category/kids-clothing',
-      subcategories: [
-        { name: 'Girls Cloths', path: '/category/kids-clothing/girls-cloths' },
-        { name: 'Boys Cloth', path: '/category/kids-clothing/boys-cloth' },
-        { name: 'Winterwear', path: '/category/kids-clothing/winterwear' },
-      ]
-    },
-    {
-      name: "KIDS ACCESSORIES",
-      path: '/category/kids-accessories',
-      subcategories: [
-        { name: 'Watches', path: '/category/kids-accessories/watches' },
-        { name: 'Sunglasses', path: '/category/kids-accessories/sunglasses' },
-      ]
-    },
-    {
-      name: "FOOTWEAR",
-      path: '/category/footwear',
-      subcategories: [
-        { name: 'Boys Footwear', path: '/category/footwear/boys-footwear' },
-        { name: 'Girls Footwear', path: '/category/footwear/girls-footwear' },
-      ]
-    },
-    {
-      name: "BABY CARE",
-      path: '/category/baby-care',
-      subcategories: [
-        { name: 'Diapers', path: '/category/baby-care/diapers' },
-        { name: 'Wipes', path: '/category/baby-care/wipes' },
-        { name: 'Baby Gear', path: '/category/baby-care/baby-gear' },
-        { name: 'Baby Proofing & Safety', path: '/category/baby-care/baby-proofing-safety' },
-      ]
-    },
-    {
-      name: "TOYS",
-      path: '/category/toys',
-      subcategories: []
-    },
-  ];
+  const categories = navbarCategories;
 
   // Close dropdown when clicking outside
   useEffect(() => {

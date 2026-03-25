@@ -1,15 +1,28 @@
 import { Product } from '../models/product.js';
-import { KidsClothing } from '../models/KidsClothing.js';
-import { Footwear } from '../models/Footwear.js';
-import { KidsAccessories } from '../models/KidsAccessories.js';
-import { BabyCare } from '../models/BabyCare.js';
-import { Toys } from '../models/Toys.js';
 import Order from '../models/Order.js';
 import { Address } from '../models/Address.js';
 import User from '../models/User.js';
 
-// Helper function to find product in any collection
-async function findProductInAllCollections(productId) {
+const slugify = (value = '') =>
+  value
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const parseCurrency = (value) => {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  const parsed = Number(String(value).replace(/[^0-9.]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+// Helper function to find product in the unified collection
+async function findProductById(productId) {
   if (!productId) {
     return null;
   }
@@ -17,27 +30,7 @@ async function findProductInAllCollections(productId) {
   // Convert to string if it's an ObjectId
   const idString = productId.toString ? productId.toString() : productId;
   
-  const collections = [
-    { model: Product, name: 'Product' },
-    { model: KidsClothing, name: 'KidsClothing' },
-    { model: Footwear, name: 'Footwear' },
-    { model: KidsAccessories, name: 'KidsAccessories' },
-    { model: BabyCare, name: 'BabyCare' },
-    { model: Toys, name: 'Toys' },
-  ];
-  
-  for (const { model, name } of collections) {
-    try {
-      const product = await model.findById(idString).lean();
-      if (product) {
-        return product;
-      }
-    } catch (err) {
-      console.error(`[findProductInAllCollections] Error checking ${name}:`, err.message);
-    }
-  }
-  
-  return null;
+  return Product.findById(idString).lean();
 }
 
 // Helper function to populate order items with products from all collections
@@ -60,7 +53,7 @@ async function populateOrderItems(items) {
           };
         }
         
-        const product = await findProductInAllCollections(productId);
+        const product = await findProductById(productId);
         
         if (!product) {
           console.warn(`[populateOrderItems] Product not found for ID: ${productId}`);
@@ -84,80 +77,101 @@ async function populateOrderItems(items) {
 
 export async function createProduct(req, res) {
   try {
-    const {
-      title,
-      mrp,
-      discountPercent = 0,
-      description = '',
-      category,
-      product_info = {},
-      images = {},
-      categoryId,
-    } = req.body || {};
+    const body = req.body || {};
+    const mainCategory = body.mainCategory || body.Category || body.category || '';
+    const subCategory = body.subCategory || body['Sub-Category'] || body.subcategory || '';
+    const subSubCategory = body.subSubCategory || body['Sub-sub-Category'] || body.subSubCategory || '';
+    const title = body.title || body.skuName || body['SKU Name'] || '';
+    const mrpValue = parseCurrency(body.mrp ?? body.MRP);
+    const discountPercent = Number(body.discountPercent || 0);
+    const description = body.description || body['About the Product'] || body.aboutProduct || '';
+    const productInfo = body.product_info || {};
+    const images = body.images || {};
+    const categoryId = body.categoryId;
 
-    if (!title || typeof mrp === 'undefined' || !category) {
-      return res.status(400).json({ message: 'title, mrp and category are required' });
+    if (!title || !mrpValue || !mainCategory) {
+      return res.status(400).json({ message: 'title (or SKU Name), mrp, and category are required' });
     }
 
     const payload = {
       title,
-      mrp: Number(mrp),
-      discountPercent: Number(discountPercent) || 0,
+      mrp: mrpValue,
+      discountPercent,
       description,
-      category,
+      category: mainCategory,
+      subcategory: subCategory,
+      subSubCategory,
+      taxonomy: {
+        mainCategory,
+        mainCategorySlug: slugify(mainCategory),
+        subCategory,
+        subCategorySlug: slugify(subCategory),
+        subSubCategory,
+        subSubCategorySlug: slugify(subSubCategory),
+      },
+      sourceData: {
+        source: body.source || 'manual',
+        productLink: body.productLink || body['Product Link'] || '',
+        eanCode: body.eanCode || body['EAN Code'] || '',
+        skuName: body.skuName || body['SKU Name'] || title,
+        skuSize: body.skuSize || body['SKU Size'] || '',
+        imageLink: body.imageLink || body['Image Link'] || images.image1 || '',
+        aboutProduct: body.aboutProduct || body['About the Product'] || description,
+        raw: body,
+      },
       product_info: {
-        brand: product_info.brand || '',
-        manufacturer: product_info.manufacturer || '',
+        brand: productInfo.brand || body.brand || body.Brand || '',
+        manufacturer: productInfo.manufacturer || body.brand || body.Brand || '',
         
         /* ---- Kids Clothing ---- */
-        clothingType: product_info.clothingType || '',
-        gender: product_info.gender || '',
-        ageGroup: product_info.ageGroup || '',
-        availableSizes: Array.isArray(product_info.availableSizes) ? product_info.availableSizes : 
-                       (product_info.availableSizes ? [product_info.availableSizes] : []),
-        fabric: product_info.fabric || '',
-        color: product_info.color || '',
+        clothingType: productInfo.clothingType || '',
+        gender: productInfo.gender || '',
+        ageGroup: productInfo.ageGroup || '',
+        availableSizes: Array.isArray(productInfo.availableSizes) ? productInfo.availableSizes : 
+                       (productInfo.availableSizes ? [productInfo.availableSizes] : []),
+        fabric: productInfo.fabric || '',
+        color: productInfo.color || '',
         
         /* ---- Footwear ---- */
-        footwearType: product_info.footwearType || '',
-        shoeMaterial: product_info.shoeMaterial || '',
-        soleMaterial: product_info.soleMaterial || '',
+        footwearType: productInfo.footwearType || '',
+        shoeMaterial: productInfo.shoeMaterial || '',
+        soleMaterial: productInfo.soleMaterial || '',
         
         /* ---- Kids Accessories ---- */
-        accessoryType: product_info.accessoryType || '',
-        material: product_info.material || '',
+        accessoryType: productInfo.accessoryType || '',
+        material: productInfo.material || '',
         
         /* ---- Baby Care ---- */
-        babyCareType: product_info.babyCareType || '',
-        ageRange: product_info.ageRange || '',
-        safetyStandard: product_info.safetyStandard || '',
-        quantity: product_info.quantity || '',
+        babyCareType: productInfo.babyCareType || '',
+        ageRange: productInfo.ageRange || '',
+        safetyStandard: productInfo.safetyStandard || '',
+        quantity: productInfo.quantity || '',
         
         /* ---- Toys ---- */
-        toyType: product_info.toyType || '',
-        batteryRequired: product_info.batteryRequired || false,
-        batteryIncluded: product_info.batteryIncluded || false,
+        toyType: productInfo.toyType || '',
+        batteryRequired: productInfo.batteryRequired || false,
+        batteryIncluded: productInfo.batteryIncluded || false,
         
         /* ---- Universal ---- */
-        includedComponents: product_info.includedComponents || '',
+        includedComponents: productInfo.includedComponents || '',
         
         // Legacy fields for backward compatibility
-        SareeLength: product_info.SareeLength || '',
-        SareeMaterial: product_info.SareeMaterial || product_info.fabric || product_info.material || '',
-        SareeColor: product_info.SareeColor || product_info.color || '',
-        IncludedComponents: product_info.IncludedComponents || product_info.includedComponents || '',
-        shoeSize: product_info.shoeSize || product_info.availableSizes?.[0] || '',
-        shoeColor: product_info.shoeColor || product_info.color || '',
-        shoeType: product_info.shoeType || product_info.footwearType || '',
-        watchBrand: product_info.watchBrand || '',
-        movementType: product_info.movementType || '',
-        caseMaterial: product_info.caseMaterial || '',
-        bandMaterial: product_info.bandMaterial || '',
-        waterResistance: product_info.waterResistance || '',
-        watchType: product_info.watchType || '',
+        SareeLength: productInfo.SareeLength || '',
+        SareeMaterial: productInfo.SareeMaterial || productInfo.fabric || productInfo.material || '',
+        SareeColor: productInfo.SareeColor || productInfo.color || '',
+        IncludedComponents: productInfo.IncludedComponents || productInfo.includedComponents || '',
+        shoeSize: productInfo.shoeSize || productInfo.availableSizes?.[0] || '',
+        shoeColor: productInfo.shoeColor || productInfo.color || '',
+        shoeType: productInfo.shoeType || productInfo.footwearType || '',
+        watchBrand: productInfo.watchBrand || '',
+        movementType: productInfo.movementType || '',
+        caseMaterial: productInfo.caseMaterial || '',
+        bandMaterial: productInfo.bandMaterial || '',
+        waterResistance: productInfo.waterResistance || '',
+        watchType: productInfo.watchType || '',
       },
       images: {
-        image1: images.image1,
+        image1: images.image1 || body.imageLink || body['Image Link'],
         image2: images.image2,
         image3: images.image3,
       },
@@ -165,24 +179,8 @@ export async function createProduct(req, res) {
 
     if (categoryId) payload.categoryId = categoryId;
 
-    // Determine which collection to use based on category
-    const categoryLower = (category || '').toLowerCase().replace(/\s+/g, '-');
-    let product;
-    
-    if (categoryLower.includes('kids-clothing') || categoryLower.includes('clothing')) {
-      product = await KidsClothing.create(payload);
-    } else if (categoryLower.includes('footwear') || categoryLower.includes('shoe')) {
-      product = await Footwear.create(payload);
-    } else if (categoryLower.includes('kids-accessories') || categoryLower.includes('accessories') || categoryLower.includes('watch') || categoryLower.includes('sunglass')) {
-      product = await KidsAccessories.create(payload);
-    } else if (categoryLower.includes('baby-care') || categoryLower.includes('babycare') || categoryLower.includes('diaper') || categoryLower.includes('lotion')) {
-      product = await BabyCare.create(payload);
-    } else if (categoryLower.includes('toy')) {
-      product = await Toys.create(payload);
-    } else {
-      // Default to Product collection for unknown categories
-      product = await Product.create(payload);
-    }
+    // Unified collection for new taxonomy-driven products.
+    const product = await Product.create(payload);
     
     return res.status(201).json(product);
   } catch (err) {
@@ -219,31 +217,8 @@ export async function updateOrderStatus(req, res) {
 
 export async function adminListProducts(req, res) {
   try {
-    // Fetch products from all category collections
-    const [products, kidsClothing, footwear, kidsAccessories, babyCare, toys] = await Promise.all([
-      Product.find({}).sort({ createdAt: -1 }).lean(),
-      KidsClothing.find({}).sort({ createdAt: -1 }).lean(),
-      Footwear.find({}).sort({ createdAt: -1 }).lean(),
-      KidsAccessories.find({}).sort({ createdAt: -1 }).lean(),
-      BabyCare.find({}).sort({ createdAt: -1 }).lean(),
-      Toys.find({}).sort({ createdAt: -1 }).lean(),
-    ]);
-    
-    // Combine all products
-    const allProducts = [
-      ...products,
-      ...kidsClothing,
-      ...footwear,
-      ...kidsAccessories,
-      ...babyCare,
-      ...toys,
-    ].sort((a, b) => {
-      const dateA = new Date(a.createdAt || 0);
-      const dateB = new Date(b.createdAt || 0);
-      return dateB - dateA; // Sort by newest first
-    });
-    
-    return res.json(allProducts);
+    const products = await Product.find({}).sort({ createdAt: -1 }).lean();
+    return res.json(products);
   } catch (err) {
     return res.status(500).json({ message: 'Failed to list products', error: err.message });
   }
@@ -252,49 +227,9 @@ export async function adminListProducts(req, res) {
 export async function deleteProductById(req, res) {
   try {
     const { id } = req.params;
-    
-    if (!id) {
-      return res.status(400).json({ message: 'Product ID is required' });
-    }
-    
-    // Convert to string if it's an ObjectId
-    const idString = id.toString ? id.toString() : id;
-    
-    // Try to find and delete from all collections
-    const collections = [
-      { model: Product, name: 'Product' },
-      { model: KidsClothing, name: 'KidsClothing' },
-      { model: Footwear, name: 'Footwear' },
-      { model: KidsAccessories, name: 'KidsAccessories' },
-      { model: BabyCare, name: 'BabyCare' },
-      { model: Toys, name: 'Toys' },
-    ];
-    
-    let deleted = false;
-    let deletedFrom = null;
-    
-    for (const { model, name } of collections) {
-      try {
-        const product = await model.findByIdAndDelete(idString);
-        if (product) {
-          deleted = true;
-          deletedFrom = name;
-          console.log(`[deleteProductById] Product deleted from ${name} collection`);
-          break; // Found and deleted, no need to check other collections
-        }
-      } catch (err) {
-        console.error(`[deleteProductById] Error checking ${name}:`, err.message);
-        // Continue to next collection
-      }
-    }
-    
-    if (deleted) {
-      return res.json({ message: 'Product deleted successfully', deletedFrom });
-    } else {
-      return res.status(404).json({ message: 'Product not found in any collection' });
-    }
+    await Product.findByIdAndDelete(id);
+    return res.json({ message: 'Deleted' });
   } catch (err) {
-    console.error('[deleteProductById] Error:', err);
     return res.status(500).json({ message: 'Failed to delete product', error: err.message });
   }
 }
@@ -370,17 +305,7 @@ export async function adminStats(req, res) {
     const totalRevenue = revenueAgg?.total || 0;
     const totalOrders = revenueAgg?.count || 0;
     
-    // Count products from all collections
-    const [productCount, kidsClothingCount, footwearCount, kidsAccessoriesCount, babyCareCount, toysCount] = await Promise.all([
-      Product.countDocuments(),
-      KidsClothing.countDocuments(),
-      Footwear.countDocuments(),
-      KidsAccessories.countDocuments(),
-      BabyCare.countDocuments(),
-      Toys.countDocuments(),
-    ]);
-    
-    const totalProducts = productCount + kidsClothingCount + footwearCount + kidsAccessoriesCount + babyCareCount + toysCount;
+    const totalProducts = await Product.countDocuments();
     
     return res.json({ totalRevenue, totalOrders, totalProducts });
   } catch (err) {
@@ -454,33 +379,11 @@ export async function updateProduct(req, res) {
       updates.discountPercent = Number(discountPercent) || 0;
     }
 
-    // Try to update in all collections
-    const collections = [
-      { model: Product, name: 'Product' },
-      { model: KidsClothing, name: 'KidsClothing' },
-      { model: Footwear, name: 'Footwear' },
-      { model: KidsAccessories, name: 'KidsAccessories' },
-      { model: BabyCare, name: 'BabyCare' },
-      { model: Toys, name: 'Toys' },
-    ];
-    
-    let updatedProduct = null;
-    for (const { model } of collections) {
-      try {
-        const result = await model.findByIdAndUpdate(
-          id,
-          { $set: updates },
-          { new: true, runValidators: true }
-        );
-        if (result) {
-          updatedProduct = result;
-          break;
-        }
-      } catch (err) {
-        // Continue to next collection
-        continue;
-      }
-    }
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
 
     if (!updatedProduct) {
       return res.status(404).json({ message: 'Product not found' });

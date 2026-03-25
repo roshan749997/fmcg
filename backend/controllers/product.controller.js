@@ -1,266 +1,172 @@
 import { Product } from '../models/product.js';
-import { KidsAccessories } from '../models/KidsAccessories.js';
-import { KidsClothing } from '../models/KidsClothing.js';
-import { Footwear } from '../models/Footwear.js';
-import { BabyCare } from '../models/BabyCare.js';
-import { Toys } from '../models/Toys.js';
 
-const CATEGORY_GROUPS = {
-  'Shoes': [
-    'Men\'s Shoes',
-    'Women\'s Shoes',
-    'Sports Shoes',
-    'Casual Shoes',
-    'Formal Shoes',
-    'Sneakers',
-    'Boots',
-    'Sandals',
-    'Running Shoes',
-    'Walking Shoes'
-  ],
-  'Watches': [
-    'Men\'s Watches',
-    'Women\'s Watches',
-    'Smart Watches',
-    'Luxury Watches',
-    'Sports Watches',
-    'Analog Watches',
-    'Digital Watches',
-    'Fitness Trackers',
-    'Chronograph Watches',
-    'Classic Watches'
-  ]
+const slugify = (value = '') =>
+  value
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const buildLooseCategoryRegex = (value = '') => {
+  const normalized = value.toString().trim().toLowerCase();
+  if (!normalized) return null;
+  // Treat &, and, hyphen, and extra spaces as equivalent separators.
+  const pattern = normalized
+    .replace(/&/g, ' and ')
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .map((part) => (part === 'and' ? '(?:and|&)' : part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+    .join('\\s*');
+  return new RegExp(`^${pattern}$`, 'i');
 };
 
-// Parent category to subcategories mapping - used when querying for parent categories
-const PARENT_TO_SUBCATEGORIES = {
-  "Men's Shoes": [
-    'Men Sports Shoes',
-    'Men Casual Shoes',
-    'Men Formal Shoes',
-    'Men Sneakers',
-    'Men Boots',
-    'Men Running Shoes'
-  ],
-  "Women's Shoes": [
-    'Women Heels',
-    'Women Flats',
-    'Women Sneakers',
-    'Women Sports Shoes',
-    'Women Casual Shoes',
-    'Women Sandals'
-  ],
-  "Child Shoes": [
-    'Child School Shoes',
-    'Child Sports Shoes',
-    'Child Casual Shoes',
-    'Child Sandals',
-    'Child Sneakers'
-  ],
-  "Girls Shoes": [
-    'Girls School Shoes',
-    'Girls Sports Shoes',
-    'Girls Casual Shoes',
-    'Girls Sandals',
-    'Girls Sneakers'
-  ],
-  "Women Watches": [
-    'Women Analog Watches',
-    'Women Digital Watches',
-    'Women Smart Watches',
-    'Women Fitness Trackers',
-    'Women Classic Watches'
-  ],
-  "Men Watches": [
-    'Men Analog Watches',
-    'Men Digital Watches',
-    'Men Smart Watches',
-    'Men Sports Watches',
-    'Men Luxury Watches',
-    'Men Chronograph Watches'
-  ]
-};
-
-// Helper function to normalize category names (handles variations like "Womens Shoes" vs "Women's Shoes")
-const normalizeCategoryName = (name) => {
-  if (!name) return '';
-  // Handle common variations
-  const normalized = name.trim();
-  const variations = {
-    'Womens Shoes': "Women's Shoes",
-    'Mens Shoes': "Men's Shoes",
-    'Women Watches': 'Women Watches',
-    'Girl Watches': 'Women Watches', // Backward compatibility
-    'Men Watches': 'Men Watches'
-  };
-  return variations[normalized] || normalized;
+const parseRupeeToNumber = (value) => {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  const numeric = String(value).replace(/[^0-9.]/g, '');
+  const parsed = Number(numeric);
+  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 export const getProducts = async (req, res) => {
   try {
-    // Accept either `subcategory` (preferred) or `category` query param
-    const rawCategory = (req.query.subcategory || req.query.category || '').toString();
-    // normalize slug-like values (e.g., "soft-silk" -> "soft silk") and trim
-    const category = rawCategory.replace(/-/g, ' ').trim();
-    let query = {};
+    const rawMain = (req.query.mainCategory || req.query.main || req.query.rootCategory || '').toString();
+    const rawCategory = (req.query.category || '').toString();
+    const rawSubCategory = (req.query.subcategory || req.query.subCategory || req.query.subSubCategory || '').toString();
 
-    console.log('Received request with query params:', req.query);
+    const mainSlug = slugify(rawMain);
+    const categorySlug = slugify(rawCategory);
+    const subCategorySlug = slugify(rawSubCategory);
+    const mainLooseRe = buildLooseCategoryRegex(rawMain || mainSlug.replace(/-/g, ' '));
+    const categoryLooseRe = buildLooseCategoryRegex(rawCategory || categorySlug.replace(/-/g, ' '));
+    const subCategoryLooseRe = buildLooseCategoryRegex(rawSubCategory || subCategorySlug.replace(/-/g, ' '));
 
-    if (category) {
-      // Normalize category name to handle variations
-      const normalizedCategory = normalizeCategoryName(category);
-      
-      // Try multiple ways to match the category or subcategory fields
-      const re = new RegExp(category, 'i');
-      const normalizedRe = normalizedCategory !== category ? new RegExp(normalizedCategory, 'i') : null;
-      
-      const orConditions = [
-        { 'category.name': { $regex: re } },
-        { 'category': { $regex: re } },
-        { 'category.slug': { $regex: re } },
-        { 'subcategory': { $regex: re } },
-        { 'tags': { $regex: re } }
-      ];
-      
-      // Special handling for kids-accessories - also match "Watches" category
-      if (category.toLowerCase().includes('kids-accessories') || category.toLowerCase().includes('kids accessories') || 
-          category.toLowerCase().includes('accessories')) {
-        orConditions.push(
-          { category: { $regex: /watch/i } },
-          { 'product_info.watchType': { $exists: true } },
-          { 'product_info.watchBrand': { $exists: true } }
-        );
-      }
-
-      // Also add normalized category regex if different
-      if (normalizedRe) {
-        orConditions.push(
-          { 'category.name': { $regex: normalizedRe } },
-          { 'category': { $regex: normalizedRe } },
-          { 'subcategory': { $regex: normalizedRe } }
-        );
-      }
-
-      // If this is a parent category, also search for all its subcategories
-      if (PARENT_TO_SUBCATEGORIES[normalizedCategory]) {
-        PARENT_TO_SUBCATEGORIES[normalizedCategory].forEach((sub) => {
-          const subRe = new RegExp(sub, 'i');
-          orConditions.push({ category: subRe });
-          orConditions.push({ 'category.name': subRe });
-          orConditions.push({ subcategory: subRe });
-        });
-        console.log(`Including subcategories for parent category "${normalizedCategory}":`, PARENT_TO_SUBCATEGORIES[normalizedCategory]);
-      }
-
-      // Also check if the original (non-normalized) category is a parent
-      if (PARENT_TO_SUBCATEGORIES[category]) {
-        PARENT_TO_SUBCATEGORIES[category].forEach((sub) => {
-          const subRe = new RegExp(sub, 'i');
-          orConditions.push({ category: subRe });
-          orConditions.push({ 'category.name': subRe });
-          orConditions.push({ subcategory: subRe });
-        });
-      }
-
-      // Also check if it matches any subcategory name directly (e.g., "Women Heels")
-      // This allows direct subcategory matching
-      Object.keys(PARENT_TO_SUBCATEGORIES).forEach((parent) => {
-        if (PARENT_TO_SUBCATEGORIES[parent].some(sub => 
-          sub.toLowerCase() === category.toLowerCase() || 
-          category.toLowerCase().includes(sub.toLowerCase()) ||
-          sub.toLowerCase().includes(category.toLowerCase())
-        )) {
-          // This is a subcategory, make sure we search for it
-          const subRe = new RegExp(category, 'i');
-          orConditions.push({ category: subRe });
-          orConditions.push({ 'category.name': subRe });
-        }
+    const andConditions = [];
+    if (mainSlug) {
+      andConditions.push({
+        $or: [
+          { 'taxonomy.mainCategorySlug': mainSlug },
+          { category: { $regex: new RegExp(`^${rawMain}$`, 'i') } },
+          { category: { $regex: new RegExp(mainSlug.replace(/-/g, ' '), 'i') } },
+          { Category: { $regex: new RegExp(`^${rawMain}$`, 'i') } },
+          { Category: { $regex: new RegExp(mainSlug.replace(/-/g, ' '), 'i') } },
+          ...(mainLooseRe ? [{ category: { $regex: mainLooseRe } }, { Category: { $regex: mainLooseRe } }] : []),
+        ],
       });
-
-      if (CATEGORY_GROUPS[category]) {
-        CATEGORY_GROUPS[category].forEach((sub) => {
-          orConditions.push({ category: { $regex: new RegExp(sub, 'i') } });
-        });
-      }
-
-      query = { $or: orConditions };
-
-      console.log('Search query:', JSON.stringify(query, null, 2));
     }
 
-    // Get all products (for debugging)
-    const allProducts = await Product.find({});
-    console.log(`Total products in database: ${allProducts.length}`);
-    
-    if (allProducts.length > 0) {
-      console.log('Sample product:', {
-        _id: allProducts[0]._id,
-        title: allProducts[0].title,
-        category: allProducts[0].category,
-        price: allProducts[0].price
+    if (categorySlug) {
+      andConditions.push({
+        $or: [
+          { 'taxonomy.subCategorySlug': categorySlug },
+          { subcategory: { $regex: new RegExp(`^${rawCategory}$`, 'i') } },
+          // Backward compatibility: older data may store 2nd-level category in `category`
+          { category: { $regex: new RegExp(`^${rawCategory}$`, 'i') } },
+          { 'Sub-Category': { $regex: new RegExp(`^${rawCategory}$`, 'i') } },
+          ...(categoryLooseRe
+            ? [
+                { subcategory: { $regex: categoryLooseRe } },
+                { category: { $regex: categoryLooseRe } },
+                { 'Sub-Category': { $regex: categoryLooseRe } },
+              ]
+            : []),
+        ],
       });
-      
-      // Log all unique categories in the database
-      const categories = [...new Set(allProducts.map(p => 
-        p.category ? (typeof p.category === 'string' ? p.category : p.category.name) : 'None'
-      ))];
-      console.log('All categories in database:', categories);
     }
 
-    // Execute the query - also check category-specific collections
-    let products = await Product.find(query);
-    console.log(`Found ${products.length} matching products from Product collection`);
+    if (subCategorySlug) {
+      andConditions.push({
+        $or: [
+          { 'taxonomy.subSubCategorySlug': subCategorySlug },
+          { subSubCategory: { $regex: new RegExp(`^${rawSubCategory}$`, 'i') } },
+          // Backward compatibility: older data may store leaf in `subcategory`
+          { subcategory: { $regex: new RegExp(`^${rawSubCategory}$`, 'i') } },
+          { 'Sub-sub-Category': { $regex: new RegExp(`^${rawSubCategory}$`, 'i') } },
+          ...(subCategoryLooseRe
+            ? [
+                { subSubCategory: { $regex: subCategoryLooseRe } },
+                { subcategory: { $regex: subCategoryLooseRe } },
+                { 'Sub-sub-Category': { $regex: subCategoryLooseRe } },
+              ]
+            : []),
+        ],
+      });
+    }
 
-    // Also fetch from category-specific collections if category matches
-    const catLower = category.toLowerCase();
-    
-    // Kids Accessories - also check for watches
-    if (catLower.includes('kids-accessories') || catLower.includes('kids accessories') || 
-        catLower.includes('watch') || catLower.includes('accessories')) {
-      try {
-        let accessoriesQuery = { category: 'kids-accessories' };
-        if (category) {
-          const re = new RegExp(category, 'i');
-          accessoriesQuery.$or = [
-            { subcategory: { $regex: re } },
-            { 'product_info.accessoryType': { $regex: re } },
-            { title: { $regex: re } }
-          ];
-        }
-        const accessoriesProducts = await KidsAccessories.find(accessoriesQuery);
-        console.log(`Found ${accessoriesProducts.length} products from KidsAccessories collection`);
-        products = [...products, ...accessoriesProducts];
-      } catch (err) {
-        console.error('Error fetching from KidsAccessories:', err);
-      }
+    const query = andConditions.length > 0 ? { $and: andConditions } : {};
+    let products = await Product.find(query).sort({ createdAt: -1 });
+
+    // Fallback for manually inserted raw dataset docs:
+    // if strict 3-level match returns no rows, try relaxed leaf match.
+    if (products.length === 0 && (subCategoryLooseRe || rawSubCategory)) {
+      const leafRegex = subCategoryLooseRe || new RegExp(rawSubCategory, 'i');
+      products = await Product.find({
+        $or: [
+          { 'taxonomy.subSubCategorySlug': subCategorySlug },
+          { subSubCategory: { $regex: leafRegex } },
+          { subcategory: { $regex: leafRegex } },
+          { 'Sub-sub-Category': { $regex: leafRegex } },
+          { 'Sub-Category': { $regex: leafRegex } },
+          { title: { $regex: leafRegex } },
+          { 'SKU Name': { $regex: leafRegex } },
+        ],
+      }).sort({ createdAt: -1 });
     }
-    
-    // Also fetch watches from old Product collection
-    if (catLower.includes('watch') || catLower.includes('kids-accessories') || catLower.includes('kids accessories')) {
-      try {
-        const watchQuery = {
-          $or: [
-            { category: { $regex: /watch/i } },
-            { 'product_info.watchType': { $exists: true } },
-            { 'product_info.watchBrand': { $exists: true } }
-          ]
-        };
-        const watchProducts = await Product.find(watchQuery);
-        // Remove duplicates
-        const existingIds = new Set(products.map(p => String(p._id)));
-        const newWatchProducts = watchProducts.filter(p => !existingIds.has(String(p._id)));
-        console.log(`Found ${newWatchProducts.length} additional watch products from Product collection`);
-        products = [...products, ...newWatchProducts];
-      } catch (err) {
-        console.error('Error fetching watches:', err);
-      }
+
+    // Native Mongo fallback for raw-key docs inserted directly via Compass.
+    // This bypasses mongoose strict query/path filtering for keys like `Sub-Category`.
+    if (products.length === 0) {
+      const rawAnd = [];
+      if (mainLooseRe) rawAnd.push({ Category: { $regex: mainLooseRe } });
+      if (categoryLooseRe) rawAnd.push({ 'Sub-Category': { $regex: categoryLooseRe } });
+      if (subCategoryLooseRe) rawAnd.push({ 'Sub-sub-Category': { $regex: subCategoryLooseRe } });
+
+      const rawQuery = rawAnd.length > 0 ? { $and: rawAnd } : {};
+      const rawDocs = await Product.collection.find(rawQuery).sort({ createdAt: -1 }).toArray();
+      products = rawDocs;
     }
-    
-    console.log(`Total products found: ${products.length}`);
 
     // Process image URLs to ensure they're absolute
     products = products.map(product => {
-      const productObj = product.toObject();
+      const productObj = typeof product?.toObject === 'function' ? product.toObject() : { ...product };
+
+      // Normalize raw dataset-shaped documents into frontend shape.
+      if (!productObj.title && productObj['SKU Name']) {
+        productObj.title = productObj['SKU Name'];
+      }
+      if ((!productObj.mrp || Number.isNaN(Number(productObj.mrp))) && productObj['MRP']) {
+        productObj.mrp = parseRupeeToNumber(productObj['MRP']);
+      }
+      if (!productObj.description && productObj['About the Product']) {
+        productObj.description = productObj['About the Product'];
+      }
+      if (!productObj.category && productObj['Category']) {
+        productObj.category = productObj['Category'];
+      }
+      if (!productObj.subcategory && productObj['Sub-Category']) {
+        productObj.subcategory = productObj['Sub-Category'];
+      }
+      if (!productObj.subSubCategory && productObj['Sub-sub-Category']) {
+        productObj.subSubCategory = productObj['Sub-sub-Category'];
+      }
+      if (!productObj.product_info) {
+        productObj.product_info = {};
+      }
+      if (!productObj.product_info.brand && productObj['Brand']) {
+        productObj.product_info.brand = productObj['Brand'];
+      }
+      if (!productObj.images) {
+        productObj.images = {};
+      }
+      if (!productObj.images.image1 && productObj['Image Link']) {
+        productObj.images.image1 = productObj['Image Link'];
+      }
       // Get base URL from environment - use production URL or fallback to localhost for development
       const baseUrl = process.env.BASE_URL || 
                      process.env.BACKEND_URL || 
@@ -335,25 +241,7 @@ export const getProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    // Try Product collection first
-    let product = await Product.findById(req.params.id);
-    
-    // If not found, try category-specific collections
-    if (!product) {
-      product = await KidsAccessories.findById(req.params.id);
-    }
-    if (!product) {
-      product = await KidsClothing.findById(req.params.id);
-    }
-    if (!product) {
-      product = await Footwear.findById(req.params.id);
-    }
-    if (!product) {
-      product = await BabyCare.findById(req.params.id);
-    }
-    if (!product) {
-      product = await Toys.findById(req.params.id);
-    }
+    const product = await Product.findById(req.params.id);
     
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -361,6 +249,42 @@ export const getProductById = async (req, res) => {
 
     // Convert to plain object to modify
     const productObj = product.toObject();
+
+    // Normalize raw dataset-shaped documents into frontend shape.
+    if (!productObj.title && productObj['SKU Name']) {
+      productObj.title = productObj['SKU Name'];
+    }
+    if ((!productObj.mrp || Number.isNaN(Number(productObj.mrp))) && productObj['MRP']) {
+      productObj.mrp = parseRupeeToNumber(productObj['MRP']);
+    }
+    if (!productObj.description && productObj['About the Product']) {
+      productObj.description = productObj['About the Product'];
+    }
+    if (!productObj.category && productObj['Category']) {
+      productObj.category = productObj['Category'];
+    }
+    if (!productObj.subcategory && productObj['Sub-Category']) {
+      productObj.subcategory = productObj['Sub-Category'];
+    }
+    if (!productObj.subSubCategory && productObj['Sub-sub-Category']) {
+      productObj.subSubCategory = productObj['Sub-sub-Category'];
+    }
+    if (!productObj.product_info) {
+      productObj.product_info = {};
+    }
+    if (!productObj.product_info.brand && productObj['Brand']) {
+      productObj.product_info.brand = productObj['Brand'];
+    }
+    // Keep brand at root for existing UI checks
+    if (!productObj.brand && (productObj['Brand'] || productObj.product_info?.brand)) {
+      productObj.brand = productObj['Brand'] || productObj.product_info.brand;
+    }
+    if (!productObj.images) {
+      productObj.images = {};
+    }
+    if (!productObj.images.image1 && productObj['Image Link']) {
+      productObj.images.image1 = productObj['Image Link'];
+    }
     
     // Get base URL from environment - use production URL or fallback to localhost for development
     const baseUrl = process.env.BASE_URL || 

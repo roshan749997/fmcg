@@ -22,17 +22,10 @@ const getCategoryEndpoint = (category) => {
   
   // Map category names to endpoints
   const categoryMap = {
-    'kids-clothing': '/kids-clothing',
-    'kids-cloth': '/kids-clothing',
-    'clothing': '/kids-clothing',
-    'footwear': '/footwear',
-    'shoes': '/footwear',
-    'kids-accessories': '/kids-accessories',
-    'accessories': '/kids-accessories',
-    'baby-care': '/baby-care',
-    'babycare': '/baby-care',
-    'toys': '/toys',
-    'toy': '/toys',
+    'beauty-hygiene': '/products',
+    'beverages': '/products',
+    'cleaning-household': '/products',
+    'snacks-branded-foods': '/products',
   };
   
   // Check exact match first
@@ -50,7 +43,7 @@ const getCategoryEndpoint = (category) => {
   return null;
 };
 
-export const fetchSarees = async (category, subcategory = null) => {
+export const fetchSarees = async (category, subcategory = null, mainCategory = null) => {
   try {
     // Determine which endpoint to use based on category
     const categoryEndpoint = getCategoryEndpoint(category);
@@ -63,6 +56,12 @@ export const fetchSarees = async (category, subcategory = null) => {
       
       // Only pass subcategory parameter, not category
       // Category is already identified by the endpoint path
+      if (mainCategory) {
+        params.append('mainCategory', mainCategory);
+      }
+      if (category) {
+        params.append('category', category);
+      }
       if (subcategory) {
         params.append('subcategory', subcategory);
       }
@@ -75,9 +74,13 @@ export const fetchSarees = async (category, subcategory = null) => {
       url = `${API_URL}/products`;
       const params = new URLSearchParams();
       
+      if (mainCategory) {
+        params.append('mainCategory', mainCategory);
+      }
       if (subcategory) {
         params.append('subcategory', subcategory);
-      } else if (category) {
+      }
+      if (category) {
         params.append('category', category);
       }
       

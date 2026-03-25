@@ -114,6 +114,7 @@ const ProductDetail = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [quantity, setQuantity] = useState(1);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
@@ -399,7 +400,7 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     if (!isAuthenticated()) return setShowLoginModal(true);
     try {
-      await addToCart(product._id || product.id, 1, selectedSize, selectedColor);
+      await addToCart(product._id || product.id, quantity, selectedSize, selectedColor);
     } catch (error) {
       if (error.message?.includes('login')) setShowLoginModal(true);
     }
@@ -408,7 +409,7 @@ const ProductDetail = () => {
   const handleBuyNow = async () => {
     if (!isAuthenticated()) return setShowLoginModal(true);
     try {
-      await addToCart(product._id || product.id, 1, selectedSize, selectedColor);
+      await addToCart(product._id || product.id, quantity, selectedSize, selectedColor);
       navigate('/cart');
     } catch (error) {
       if (error.message?.includes('login')) setShowLoginModal(true);
@@ -437,22 +438,40 @@ const ProductDetail = () => {
   
   const finalPrice = product.finalPrice || product.price || (product.mrp ? product.mrp - (product.mrp * (product.discountPercent || 0) / 100) : 0);
   const originalPrice = product.originalPrice || product.mrp || product.price || 0;
+  const discountPercent = originalPrice > finalPrice ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : (product.discountPercent || 0);
+  const productTitle = product.name || product.title || 'Product';
+  const productBrand = product.brand || product.product_info?.brand || product.product_info?.manufacturer || '';
+  const productDescription = product.description || product.productDetails?.description || '';
+  const productCategory = product.category || '';
+  const productSubCategory = product.subcategory || product['Sub-Category'] || '';
+  const productLeafCategory = product.subSubCategory || product['Sub-sub-Category'] || '';
+  const availableSizes = product.product_info?.availableSizes || [];
+  const productColor = product.product_info?.color || product.color || '';
+  const specRows = [
+    productBrand ? ['Brand', productBrand] : null,
+    product.product_info?.manufacturer ? ['Manufacturer', product.product_info.manufacturer] : null,
+    productCategory ? ['Category', productCategory] : null,
+    productSubCategory ? ['Sub Category', productSubCategory] : null,
+    productLeafCategory ? ['Product Type', productLeafCategory] : null,
+    product.product_info?.material ? ['Material', product.product_info.material] : null,
+    product.product_info?.shoeMaterial ? ['Material', product.product_info.shoeMaterial] : null,
+    availableSizes.length > 0 ? ['Available Sizes', availableSizes.join(', ')] : null,
+    productColor ? ['Color', productColor] : null,
+  ].filter(Boolean);
   
-  // Split product name for highlighting
-  const nameWords = (product.name || product.title || 'Product').split(' ');
-  const highlightWords = ['black', 'strap', 'steel', 'pro', 'sport', 'premium', 'designer'];
+  // Keep a clean, readable title style across all products
+  const displayTitle = productTitle;
 
   return (
     <>
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       
-      <div className="min-h-screen bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          
+      <div className="min-h-screen bg-[#f1f3f6]">
+        <div className="max-w-[1320px] mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-6 pb-20 sm:pb-6">
           {/* Back Button */}
           <button 
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-sm text-black hover:text-gray-700 mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-black mb-4 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -460,99 +479,109 @@ const ProductDetail = () => {
             back
           </button>
 
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
+          <div className="bg-white border border-gray-200 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.06)] p-3 sm:p-4 lg:p-5">
+            <div className="grid lg:grid-cols-[44%_56%] gap-3 sm:gap-4 lg:gap-6">
             
-            {/* LEFT COLUMN: Product Visualization */}
-            <div className="relative lg:sticky lg:top-8 h-fit order-first lg:order-first">
-              
-              {/* Main Product Image */}
-              <div className="relative aspect-square bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-6 shadow-lg max-w-md mx-auto lg:max-w-full flex items-center justify-center">
-                {/* Best Seller Badge */}
-                <div className="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-semibold text-black shadow-sm">
-                  best seller
+            {/* LEFT COLUMN: Flipkart-like gallery */}
+            <div className="p-1 sm:p-2 h-fit">
+              <div className="grid grid-cols-[56px_1fr] gap-3">
+                <div className="space-y-2 max-h-[420px] overflow-auto pr-1 scrollbar-hide">
+                  {images.map((img, idx) => {
+                    const thumbUrl = typeof img === 'string' ? img : (img?.url || placeholders.thumbnail);
+                    const isActive = idx === selectedImageIndex;
+                    return (
+                      <button
+                        key={`${thumbUrl}-${idx}`}
+                        type="button"
+                        onClick={() => setSelectedImageIndex(idx)}
+                        className={`w-12 h-12 border rounded-sm overflow-hidden bg-white ${
+                          isActive ? 'border-blue-500' : 'border-gray-200 hover:border-gray-400'
+                        }`}
+                      >
+                        <img
+                          src={thumbUrl}
+                          alt={`Thumbnail ${idx + 1}`}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = placeholders.thumbnail;
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Navigation Arrows */}
-                {images.length > 1 && (
-                  <div className="absolute bottom-3 right-3 z-10 flex gap-1.5">
-                    <button 
-                      onClick={handlePrevImage}
-                      className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-sm"
-                      aria-label="Previous image"
-                    >
-                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={handleNextImage}
-                      className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-sm"
-                      aria-label="Next image"
-                    >
-                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
+                <div className="relative">
+                  <div className="aspect-square max-h-[360px] sm:max-h-[400px] lg:max-h-[420px] xl:max-h-[460px] w-full bg-white flex items-center justify-center border border-gray-100 rounded-sm overflow-hidden mx-auto">
+                    <img
+                      src={imageUrl}
+                      alt={productTitle}
+                      className="max-w-full max-h-full object-contain p-3 sm:p-4"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = placeholders.productDetail;
+                      }}
+                      loading="lazy"
+                    />
                   </div>
-                )}
-
-                <img 
-                  src={imageUrl} 
-                  alt={product.name || product.title || 'Product'} 
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = placeholders.productDetail;
-                  }}
-                  loading="lazy"
-                />
-                
-                {/* Interactive Labels */}
-                {product.color && (
-                  <div className="absolute top-1/4 right-4 sm:right-8">
-                    <div className="relative">
-                      <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-gray-500 rounded-full z-10"></div>
-                      <div className="bg-gray-800/90 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-1 rounded-full whitespace-nowrap">
-                        {product.color}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {product.brand && (
-                  <div className="absolute bottom-1/3 left-4 sm:left-8">
-                    <div className="relative">
-                      <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-gray-500 rounded-full z-10"></div>
-                      <div className="bg-gray-800/90 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-1 rounded-full whitespace-nowrap">
-                        {product.brand}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        onClick={handlePrevImage}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm"
+                        aria-label="Previous image"
+                      >
+                        <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={handleNextImage}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm"
+                        aria-label="Next image"
+                      >
+                        <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
-              {/* Size Selection */}
-              {product.product_info?.availableSizes && product.product_info.availableSizes.length > 0 && (
-                <div className="mb-4">
-                  <label className="block text-xs font-medium text-black mb-2">Select Size</label>
+              <div className="mt-4 hidden sm:flex gap-2">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 h-12 bg-[#ff9f00] text-white font-semibold rounded-sm hover:opacity-95"
+                >
+                  ADD TO CART
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  className="flex-1 h-12 bg-[#fb641b] text-white font-semibold rounded-sm hover:opacity-95"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {availableSizes.length > 0 && (
+                <div className="mt-4">
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Select Size</label>
                   <div className="flex flex-wrap gap-2">
-                    {product.product_info.availableSizes.map((size) => {
+                    {availableSizes.map((size) => {
                       const isSelected = selectedSize === size;
                       return (
                         <button
                           key={size}
                           onClick={() => setSelectedSize(size)}
-                          className={`px-3 py-2 rounded-lg border-2 transition-all flex items-center gap-1.5 ${
+                          className={`px-3 py-1.5 rounded-sm border transition-all text-sm ${
                             isSelected
-                              ? 'border-black bg-gray-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-blue-600 text-blue-700 bg-blue-50'
+                              : 'border-gray-300 hover:border-gray-400'
                           }`}
                         >
-                          <span className="text-xs font-medium text-black">{size}</span>
-                          {isSelected && (
-                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
+                          {size}
                         </button>
                       );
                     })}
@@ -560,335 +589,101 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              {/* Color Swatches */}
-              {(product.product_info?.color || product.color) && (
+              {productColor && (
+                <div className="mt-4 text-sm text-gray-700">
+                  <span className="font-medium">Color:</span> {productColor}
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT COLUMN: Flipkart-like info */}
+            <div className="p-2 sm:p-3 space-y-5">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-medium text-[#212121] leading-snug">{displayTitle}</h1>
+                {productBrand && (
+                  <p className="text-sm text-[#878787] mt-1">by <span className="text-[#2874f0] font-medium">{productBrand}</span></p>
+                )}
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 bg-[#388e3c] text-white text-xs px-2 py-0.5 rounded">
+                    4.2 <FaStar className="w-3 h-3" />
+                  </span>
+                  <span className="text-xs text-[#878787]">2,184 ratings & 146 reviews</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-3xl font-semibold text-[#212121]">₹{Math.round(finalPrice).toLocaleString()}</span>
+                {originalPrice > finalPrice && <span className="text-base text-[#878787] line-through">₹{Math.round(originalPrice).toLocaleString()}</span>}
+                {discountPercent > 0 && <span className="text-base font-semibold text-[#388e3c]">{discountPercent}% off</span>}
+              </div>
+
+              <div className="border border-[#f0f0f0] rounded-sm p-3 bg-[#fcfcfc]">
+                <h3 className="text-sm font-semibold text-[#212121] mb-2">Available offers</h3>
+                <ul className="space-y-1.5 text-sm text-[#212121]">
+                  <li><span className="font-medium">Bank Offer</span> 10% Instant Discount on select cards</li>
+                  <li><span className="font-medium">Special Price</span> Extra discount on combo orders</li>
+                  <li><span className="font-medium">Free Delivery</span> for orders above ₹1,000</li>
+                </ul>
+              </div>
+
+              <div className="grid sm:grid-cols-[120px_1fr] gap-2 items-center">
+                <span className="text-sm text-[#878787]">Quantity</span>
+                <div className="inline-flex items-center border border-gray-300 rounded-sm w-fit">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="w-8 h-8 text-lg text-[#212121] hover:bg-gray-100"
+                  >
+                    -
+                  </button>
+                  <span className="w-10 text-center text-sm font-medium">{quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+                    className="w-8 h-8 text-lg text-[#212121] hover:bg-gray-100"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-[120px_1fr] gap-2 items-center border-b border-[#f0f0f0] pb-4">
+                <span className="text-sm text-[#878787]">Delivery</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter pincode"
+                    className="h-9 px-3 border border-[#dfe1e5] rounded-sm text-sm outline-none focus:border-[#2874f0] w-full sm:w-48"
+                  />
+                  <button className="text-sm font-semibold text-[#2874f0]">Check</button>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium text-[#212121] mb-3">Product details</h3>
+                <div className="grid sm:grid-cols-[170px_1fr] gap-y-2 text-sm">
+                  {specRows.map(([label, value]) => (
+                    <>
+                      <div key={`${label}-label`} className="text-[#878787]">{label}</div>
+                      <div key={`${label}-value`} className="text-[#212121]">{value}</div>
+                    </>
+                  ))}
+                </div>
+              </div>
+
+              {productDescription && (
                 <div>
-                  <label className="block text-xs font-medium text-black mb-2">Select Color</label>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {[product.product_info?.color || product.color || '#000000'].slice(0, 6).map((color, idx) => {
-                      const isSelected = selectedColor === color || (!selectedColor && idx === 0);
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => setSelectedColor(color)}
-                          className={`relative w-10 h-10 rounded-full border-2 transition-all ${
-                            isSelected ? 'border-black scale-110 shadow-md' : 'border-gray-300 hover:border-gray-500'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          aria-label={`Select color ${color}`}
-                        >
-                          {isSelected && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <svg className="w-5 h-5 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <h3 className="text-lg font-medium text-[#212121] mb-2">Description</h3>
+                  <p className="text-sm text-[#212121] leading-6 whitespace-pre-line">{productDescription}</p>
                 </div>
               )}
-            </div>
 
-            {/* RIGHT COLUMN: Product Information */}
-            <div className="flex flex-col space-y-6 lg:space-y-8 order-last lg:order-last">
-              
-              {/* Product Title & Brand */}
-              <div className="space-y-3">
-                {(product.brand || product.product_info?.manufacturer) && (
-                  <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                    {product.brand || product.product_info?.manufacturer}
-                  </div>
-                )}
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
-                  {nameWords.map((word, idx) => {
-                    const shouldHighlight = highlightWords.some(hw => word.toLowerCase().includes(hw.toLowerCase()));
-                    return (
-                      <span key={idx} className="inline-block mr-2">
-                        {shouldHighlight ? (
-                          <span className="relative inline-block">
-                            <span className="relative z-10">{word}</span>
-                            <span className="absolute inset-0 bg-gray-200/40 rounded-lg blur-sm transform -rotate-1 -z-0"></span>
-                          </span>
-                        ) : (
-                          <span>{word}</span>
-                        )}
-                      </span>
-                    );
-                  })}
-                </h1>
-              </div>
-
-              {/* Price Section */}
-              <div className="flex items-baseline gap-3 pb-4 border-b border-gray-200">
-                <span className="text-3xl lg:text-4xl font-bold text-black">₹{Math.round(finalPrice).toLocaleString()}</span>
-                {originalPrice > finalPrice && (
-                  <>
-                    <span className="text-lg text-gray-400 line-through">₹{Math.round(originalPrice).toLocaleString()}</span>
-                    <span className="text-sm font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
-                      {Math.round(((originalPrice - finalPrice) / originalPrice) * 100)}% OFF
-                    </span>
-                  </>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-row gap-3">
-                <button 
-                  onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 text-black font-semibold px-6 py-3.5 rounded-lg transition-all shadow-lg hover:shadow-xl active:scale-[0.98] text-base border-2 border-black"
-                  style={{ backgroundColor: '#FFD1DC' }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#FFB6C1'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#FFD1DC'}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  <span>Add to Cart</span>
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  className="flex-1 flex items-center justify-center gap-2 text-black font-semibold px-6 py-3.5 rounded-lg transition-all shadow-md hover:shadow-lg active:scale-[0.98] text-base border-2 border-black"
-                  style={{ backgroundColor: '#FFD1DC' }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#FFB6C1'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#FFD1DC'}
-                >
-                  <span>Buy Now</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Quick Info Cards */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-1">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-xs font-semibold text-black uppercase">Free Shipping</span>
-                  </div>
-                  <p className="text-xs text-black">On orders over ₹1,000</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-1">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span className="text-xs font-semibold text-black uppercase">Easy Returns</span>
-                  </div>
-                  <p className="text-xs text-black">30 days return policy</p>
-                </div>
-              </div>
-
-              {/* Product Details */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="text-lg font-semibold text-black mb-4">Product Details</h3>
-                <div className="space-y-3 text-sm text-black">
-                  {(product.description || product.productDetails?.description) && (
-                    <p className="leading-relaxed">
-                      {product.description || product.productDetails?.description}
-                    </p>
-                  )}
-                  <div className="pt-3 border-t border-gray-100 space-y-2">
-                    {(product.brand || product.product_info?.brand) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Brand:</span>
-                        <span className="text-black">{product.brand || product.product_info?.brand}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.manufacturer) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Manufacturer:</span>
-                        <span className="text-black">{product.product_info.manufacturer}</span>
-                      </div>
-                    )}
-                    
-                    {/* Kids Clothing Fields */}
-                    {(product.product_info?.clothingType) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Clothing Type:</span>
-                        <span className="text-black">{product.product_info.clothingType}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.gender) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Gender:</span>
-                        <span className="text-black">{product.product_info.gender}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.ageGroup) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Age Group:</span>
-                        <span className="text-black">{product.product_info.ageGroup}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.fabric) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Fabric:</span>
-                        <span className="text-black">{product.product_info.fabric}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.color || product.color) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Color:</span>
-                        <span className="text-black capitalize">{product.product_info?.color || product.color}</span>
-                      </div>
-                    )}
-                    
-                    {/* Footwear Fields */}
-                    {(product.product_info?.footwearType) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Footwear Type:</span>
-                        <span className="text-black">{product.product_info.footwearType}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.shoeMaterial) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Material:</span>
-                        <span className="text-black">{product.product_info.shoeMaterial}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.soleMaterial) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Sole Material:</span>
-                        <span className="text-black">{product.product_info.soleMaterial}</span>
-                      </div>
-                    )}
-                    
-                    {/* Kids Accessories Fields */}
-                    {(product.product_info?.accessoryType) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Accessory Type:</span>
-                        <span className="text-black">{product.product_info.accessoryType}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.material) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Material:</span>
-                        <span className="text-black">{product.product_info.material}</span>
-                      </div>
-                    )}
-                    
-                    {/* Baby Care Fields */}
-                    {(product.product_info?.babyCareType) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Baby Care Type:</span>
-                        <span className="text-black">{product.product_info.babyCareType}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.ageRange) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Age Range:</span>
-                        <span className="text-black">{product.product_info.ageRange}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.safetyStandard) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Safety Standard:</span>
-                        <span className="text-black">{product.product_info.safetyStandard}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.quantity) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Quantity:</span>
-                        <span className="text-black">{product.product_info.quantity}</span>
-                      </div>
-                    )}
-                    
-                    {/* Toys Fields */}
-                    {(product.product_info?.toyType) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Toy Type:</span>
-                        <span className="text-black">{product.product_info.toyType}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.batteryRequired !== undefined) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Battery Required:</span>
-                        <span className="text-black">{product.product_info.batteryRequired ? 'Yes' : 'No'}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.batteryIncluded !== undefined) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Battery Included:</span>
-                        <span className="text-black">{product.product_info.batteryIncluded ? 'Yes' : 'No'}</span>
-                      </div>
-                    )}
-                    
-                    {/* Universal Fields */}
-                    {(product.product_info?.availableSizes && product.product_info.availableSizes.length > 0) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Available Sizes:</span>
-                        <span className="text-black">{product.product_info.availableSizes.join(', ')}</span>
-                      </div>
-                    )}
-                    {(product.product_info?.includedComponents) && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Included:</span>
-                        <span className="text-black">{product.product_info.includedComponents}</span>
-                      </div>
-                    )}
-                    
-                    {product.category && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Category:</span>
-                        <span className="text-black capitalize">{product.category}</span>
-                      </div>
-                    )}
-                    {product.mrp && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">MRP:</span>
-                        <span className="text-black">₹{product.mrp.toLocaleString()}</span>
-                      </div>
-                    )}
-                    {product.discountPercent > 0 && (
-                      <div className="flex justify-between">
-                        <span className="font-medium text-black">Discount:</span>
-                        <span className="text-black">{product.discountPercent}% OFF</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Delivery & Returns Info */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="text-lg font-semibold text-black mb-4">Shipping & Returns</h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <div>
-                      <p className="font-medium text-black">Free Shipping</p>
-                      <p className="text-black">On orders over ₹1,000. Standard delivery in 5-7 business days.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <div>
-                      <p className="font-medium text-black">30-Day Returns</p>
-                      <p className="text-black">Easy returns within 30 days of purchase. No questions asked.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <div>
-                      <p className="font-medium text-black">Secure Payment</p>
-                      <p className="text-black">Your payment information is safe and encrypted.</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="bg-[#f5faff] border border-[#d6e8ff] rounded-sm p-3 text-sm">
+                <div className="font-medium text-[#212121]">Safe and secure payments. Easy returns.</div>
+                <div className="text-[#555] mt-1">Free shipping on eligible orders.</div>
               </div>
             </div>
+          </div>
           </div>
 
           {/* Trending Now Section - All Product Recommendations */}
@@ -1052,6 +847,22 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky purchase bar */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 p-2 grid grid-cols-2 gap-2 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
+        <button
+          onClick={handleAddToCart}
+          className="h-11 bg-[#ff9f00] text-white text-sm font-semibold rounded-sm"
+        >
+          ADD TO CART
+        </button>
+        <button
+          onClick={handleBuyNow}
+          className="h-11 bg-[#fb641b] text-white text-sm font-semibold rounded-sm"
+        >
+          BUY NOW
+        </button>
       </div>
       
       <style>{`

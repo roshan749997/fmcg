@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { navbarCategories } from '../data/categoryTree';
 
 const MobileHeader = () => {
   const [activeCategory, setActiveCategory] = useState(null);
@@ -9,48 +10,7 @@ const MobileHeader = () => {
   const navigate = useNavigate();
 
   // Categories with subcategories (same as Navbar)
-  const categories = [
-    {
-      name: "Kids Clothing",
-      path: '/category/kids-clothing',
-      subcategories: [
-        { name: 'Girls Cloths', path: '/category/kids-clothing/girls-cloths' },
-        { name: 'Boys Cloth', path: '/category/kids-clothing/boys-cloth' },
-        { name: 'Winterwear', path: '/category/kids-clothing/winterwear' },
-      ]
-    },
-    {
-      name: "Kids Accessories",
-      path: '/category/kids-accessories',
-      subcategories: [
-        { name: 'Watches', path: '/category/kids-accessories/watches' },
-        { name: 'Sunglasses', path: '/category/kids-accessories/sunglasses' },
-      ]
-    },
-    {
-      name: "Footwear",
-      path: '/category/footwear',
-      subcategories: [
-        { name: 'Boys Footwear', path: '/category/footwear/boys-footwear' },
-        { name: 'Girls Footwear', path: '/category/footwear/girls-footwear' },
-      ]
-    },
-    {
-      name: "Baby Care",
-      path: '/category/baby-care',
-      subcategories: [
-        { name: 'Diapers', path: '/category/baby-care/diapers' },
-        { name: 'Wipes', path: '/category/baby-care/wipes' },
-        { name: 'Baby Gear', path: '/category/baby-care/baby-gear' },
-        { name: 'Baby Proofing & Safety', path: '/category/baby-care/baby-proofing-safety' },
-      ]
-    },
-    {
-      name: "Toys",
-      path: '/category/toys',
-      subcategories: []
-    },
-  ];
+  const categories = navbarCategories;
 
   // Calculate dropdown top position
   useEffect(() => {

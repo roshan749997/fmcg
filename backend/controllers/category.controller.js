@@ -1,4 +1,5 @@
 import { Category } from '../models/Category.js';
+import { categoryTaxonomy, flattenedTaxonomy } from '../data/categoryTaxonomy.js';
 
 // Get all categories with subcategories
 export const getAllCategories = async (req, res) => {
@@ -30,7 +31,25 @@ export const getAllCategories = async (req, res) => {
       subcategories: subcategoriesByParent[String(parent._id)] || []
     }));
 
-    // Return all categories (parents with subs) and flat list
+    // Return all categories (parents with subs) and flat list.
+    // If DB has no category setup yet, fallback to code taxonomy.
+    if (parentCategories.length === 0) {
+      return res.json({
+        categories: categoryTaxonomy.map((main) => ({
+          _id: `main-${main.name}`,
+          name: main.name,
+          slug: main.name.toLowerCase().replace(/&/g, ' and ').replace(/\s+/g, '-'),
+          subcategories: main.subcategories.map((sub) => ({
+            _id: `sub-${main.name}-${sub.name}`,
+            name: sub.name,
+            slug: sub.name.toLowerCase().replace(/&/g, ' and ').replace(/\s+/g, '-'),
+            subSubcategories: sub.subSubcategories,
+          })),
+        })),
+        allCategories: flattenedTaxonomy,
+      });
+    }
+
     return res.json({
       categories: categoriesWithSubs,
       allCategories: [

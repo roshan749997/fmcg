@@ -1,10 +1,5 @@
 import { Category } from '../models/Category.js';
 import { Product } from '../models/product.js';
-import { KidsAccessories } from '../models/KidsAccessories.js';
-import { KidsClothing } from '../models/KidsClothing.js';
-import { Footwear } from '../models/Footwear.js';
-import { BabyCare } from '../models/BabyCare.js';
-import { Toys } from '../models/Toys.js';
 
 export const getHeaderData = async (req, res) => {
   try {
@@ -80,33 +75,10 @@ export const searchProducts = async (req, res) => {
       ]
     };
 
-    // Search across all collections in parallel
-    const [products, kidsClothing, kidsAccessories, footwear, babyCare, toys] = await Promise.all([
-      Product.find(searchQuery).limit(20).select('title images price mrp discountPercent _id').lean(),
-      KidsClothing.find(searchQuery).limit(20).select('title images price mrp discountPercent _id').lean(),
-      KidsAccessories.find(searchQuery).limit(20).select('title images price mrp discountPercent _id').lean(),
-      Footwear.find(searchQuery).limit(20).select('title images price mrp discountPercent _id').lean(),
-      BabyCare.find(searchQuery).limit(20).select('title images price mrp discountPercent _id').lean(),
-      Toys.find(searchQuery).limit(20).select('title images price mrp discountPercent _id').lean()
-    ]);
-
-    // Combine all results
-    const allResults = [
-      ...products,
-      ...kidsClothing,
-      ...kidsAccessories,
-      ...footwear,
-      ...babyCare,
-      ...toys
-    ];
-
-    // Remove duplicates based on _id
-    const uniqueResults = allResults.filter((product, index, self) =>
-      index === self.findIndex((p) => p._id.toString() === product._id.toString())
-    );
-
-    // Limit to 20 results
-    const limitedResults = uniqueResults.slice(0, 20);
+    const limitedResults = await Product.find(searchQuery)
+      .limit(20)
+      .select('title images price mrp discountPercent _id')
+      .lean();
 
     console.log(`Search for "${query}": Found ${limitedResults.length} products`);
     res.json({ results: limitedResults });

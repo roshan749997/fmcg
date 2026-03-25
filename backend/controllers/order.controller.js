@@ -1,13 +1,8 @@
 import Order from '../models/Order.js';
 import { Product } from '../models/product.js';
-import { KidsClothing } from '../models/KidsClothing.js';
-import { Footwear } from '../models/Footwear.js';
-import { KidsAccessories } from '../models/KidsAccessories.js';
-import { BabyCare } from '../models/BabyCare.js';
-import { Toys } from '../models/Toys.js';
 
-// Helper function to find product in any collection
-async function findProductInAllCollections(productId) {
+// Helper function to find product in unified collection
+async function findProductById(productId) {
   if (!productId) {
     return null;
   }
@@ -15,27 +10,7 @@ async function findProductInAllCollections(productId) {
   // Convert to string if it's an ObjectId
   const idString = productId.toString ? productId.toString() : productId;
   
-  const collections = [
-    { model: Product, name: 'Product' },
-    { model: KidsClothing, name: 'KidsClothing' },
-    { model: Footwear, name: 'Footwear' },
-    { model: KidsAccessories, name: 'KidsAccessories' },
-    { model: BabyCare, name: 'BabyCare' },
-    { model: Toys, name: 'Toys' },
-  ];
-
-  for (const { model, name } of collections) {
-    try {
-      const product = await model.findById(idString);
-      if (product) {
-        return product;
-      }
-    } catch (err) {
-      // Continue to next collection
-      console.warn(`[findProductInAllCollections] Error searching ${name} collection:`, err.message);
-    }
-  }
-  return null;
+  return Product.findById(idString);
 }
 
 // Helper function to populate order items with products from all collections
@@ -58,7 +33,7 @@ async function populateOrderItems(items) {
           };
         }
         
-        const product = await findProductInAllCollections(productId);
+        const product = await findProductById(productId);
         // Convert Mongoose document to plain object to ensure proper serialization
         const productObj = product ? (product.toObject ? product.toObject() : product) : null;
         

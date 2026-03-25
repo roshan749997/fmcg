@@ -3,43 +3,19 @@ import mongoose from 'mongoose';
 import auth from '../middleware/auth.js';
 import Cart from '../models/Cart.js';
 import { Product } from '../models/product.js';
-import { KidsClothing } from '../models/KidsClothing.js';
-import { Footwear } from '../models/Footwear.js';
-import { KidsAccessories } from '../models/KidsAccessories.js';
-import { BabyCare } from '../models/BabyCare.js';
-import { Toys } from '../models/Toys.js';
 
 const router = Router();
 
-// Helper function to find product in any collection
-async function findProductInAllCollections(productId) {
-  const collections = [
-    { model: Product, name: 'Product' },
-    { model: KidsClothing, name: 'KidsClothing' },
-    { model: Footwear, name: 'Footwear' },
-    { model: KidsAccessories, name: 'KidsAccessories' },
-    { model: BabyCare, name: 'BabyCare' },
-    { model: Toys, name: 'Toys' },
-  ];
-
-  for (const { model } of collections) {
-    try {
-      const product = await model.findById(productId);
-      if (product) {
-        return product;
-      }
-    } catch (err) {
-      // Continue to next collection
-    }
-  }
-  return null;
+// Helper function to find product in unified collection
+async function findProductById(productId) {
+  return Product.findById(productId);
 }
 
 // Helper function to populate cart items
 async function populateCartItems(items) {
   return Promise.all(
     items.map(async (item) => {
-      const product = await findProductInAllCollections(item.product);
+      const product = await findProductById(item.product);
       // Convert Mongoose document to plain object to ensure proper serialization
       const productObj = product ? (product.toObject ? product.toObject() : product) : item.product;
       return {
@@ -61,7 +37,7 @@ router.get('/', auth, async (req, res) => {
     // Manually populate products from all collections
     const populatedItems = await Promise.all(
       cart.items.map(async (item) => {
-        const product = await findProductInAllCollections(item.product);
+        const product = await findProductById(item.product);
         // Convert Mongoose document to plain object to ensure proper serialization
         const productObj = product ? (product.toObject ? product.toObject() : product) : item.product;
         return {

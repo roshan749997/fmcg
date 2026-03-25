@@ -8,12 +8,6 @@ import authRoutes from './routes/auth.routes.js';
 // OTP routes are already included in auth.routes.js, no need to import separately
 import headerRoutes from './routes/header.routes.js';
 import productRoutes from './routes/product.routes.js';
-// Category-specific routes for better performance
-import kidsClothingRoutes from './routes/kidsClothing.routes.js';
-import footwearRoutes from './routes/footwear.routes.js';
-import kidsAccessoriesRoutes from './routes/kidsAccessories.routes.js';
-import babyCareRoutes from './routes/babyCare.routes.js';
-import toysRoutes from './routes/toys.routes.js';
 import cartRoutes from './routes/cart.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import addressRoutes from './routes/address.routes.js';
@@ -41,19 +35,12 @@ const server = express();
 // When behind proxy (Render)
 server.set('trust proxy', 1);
 
-// CORS configuration - Allow all frontend URLs
-const frontendUrls = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://kidzfa.onrender.com',
-  'https://www.kidzfa.in',
-  'https://kidzfa.in',
-].filter(Boolean); // Remove any undefined/null values
-
+// CORS configuration
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 server.use(
   cors({
-    origin: frontendUrls,
+    origin: [frontendUrl,"https://www.kidzfa.in",
+    "https://kidzfa.in", 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -80,13 +67,7 @@ server.get('/api/me', cookieJwtAuth, (req, res) => {
 server.use('/api/auth', authRoutes);
 // OTP routes are already included in auth.routes.js
 server.use('/api/header', headerRoutes);
-server.use('/api/products', productRoutes); // Legacy route - kept for backward compatibility
-// Category-specific routes for better performance
-server.use('/api/kids-clothing', kidsClothingRoutes);
-server.use('/api/footwear', footwearRoutes);
-server.use('/api/kids-accessories', kidsAccessoriesRoutes);
-server.use('/api/baby-care', babyCareRoutes);
-server.use('/api/toys', toysRoutes);
+server.use('/api/products', productRoutes);
 server.use('/api/cart', cartRoutes);
 server.use('/api/payment', paymentRoutes);
 server.use('/api/address', addressRoutes);

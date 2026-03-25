@@ -89,7 +89,7 @@ router.get(
     
     if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
       console.error('[Google OAuth] Missing credentials - Client ID or Secret not configured');
-      return res.redirect(`${FRONTEND_URL}/signin?error=${encodeURIComponent('Google OAuth is not configured. Please contact support.')}`);
+      return res.redirect(`${FRONTEND_URL}/auth/failure?error=${encodeURIComponent('Google OAuth is not configured. Please contact support.')}`);
     }
     
     next();
@@ -117,7 +117,7 @@ router.get(
     });
     
     passport.authenticate('google', {
-      failureRedirect: `${FRONTEND_URL}/signin`,
+      failureRedirect: `${FRONTEND_URL}/auth/failure`,
       session: false,
     })(req, res, next);
   },
@@ -127,7 +127,7 @@ router.get(
 
       if (!user) {
         console.error('[Google OAuth] No user object after authentication');
-        return res.redirect(`${FRONTEND_URL}/signin?error=${encodeURIComponent('Authentication failed: User not found')}`);
+        return res.redirect(`${FRONTEND_URL}/auth/failure?error=${encodeURIComponent('Authentication failed: User not found')}`);
       }
 
       console.log('[Google OAuth] User authenticated:', {
@@ -174,14 +174,14 @@ router.get(
       });
 
       // 🔥 FINAL REDIRECT AFTER SUCCESSFUL GOOGLE LOGIN
-      // Redirect to frontend root (home page)
-      console.log('[Google OAuth] Redirecting to frontend:', FRONTEND_URL);
-      return res.redirect(FRONTEND_URL);
+      // Sends the user to frontend with success page
+      console.log('[Google OAuth] Redirecting to success page:', `${FRONTEND_URL}/auth/success`);
+      return res.redirect(`${FRONTEND_URL}/auth/success`);
     } catch (e) {
       console.error("[Google OAuth] Error in callback handler:", e);
       console.error("[Google OAuth] Error stack:", e.stack);
       const errorMessage = encodeURIComponent(e.message || 'Authentication failed');
-      return res.redirect(`${FRONTEND_URL}/signin?error=${errorMessage}`);
+      return res.redirect(`${FRONTEND_URL}/auth/failure?error=${errorMessage}`);
     }
   }
 );
