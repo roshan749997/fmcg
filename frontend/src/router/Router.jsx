@@ -26,7 +26,6 @@ import AdminProducts from '../pages/admin/AdminProducts';
 import AdminOrders from '../pages/admin/AdminOrders';
 import AdminLayout from '../pages/admin/AdminLayout';
 import AdminAddresses from '../pages/admin/AdminAddresses';
-import AdminPolicies from '../pages/admin/AdminPolicies';
 import AdminContactInfo from '../pages/admin/AdminContactInfo';
 import AdminLogos from '../pages/admin/AdminLogos';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
@@ -152,20 +151,19 @@ const Router = () => {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="addresses" element={<AdminAddresses />} />
-            <Route path="policies" element={<AdminPolicies />} />
             <Route path="contact-info" element={<AdminContactInfo />} />
             <Route path="logos" element={<AdminLogos />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </WishlistProvider>
 
-      {backgroundLocation && (
-        <Routes>
-          <Route path="signin" element={<RedirectIfAuth><SignIn /></RedirectIfAuth>} />
-          <Route path="signup" element={<RedirectIfAuth><SignUp /></RedirectIfAuth>} />
-        </Routes>
-      )}
+        {backgroundLocation && (
+          <Routes>
+            <Route path="signin" element={<RedirectIfAuth><SignIn /></RedirectIfAuth>} />
+            <Route path="signup" element={<RedirectIfAuth><SignUp /></RedirectIfAuth>} />
+          </Routes>
+        )}
+      </WishlistProvider>
     </CartProvider>
   );
 };

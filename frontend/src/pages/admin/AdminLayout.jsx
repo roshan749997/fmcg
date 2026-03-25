@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { FiGrid, FiBox, FiShoppingBag, FiLogOut, FiUser, FiHome, FiMenu, FiX, FiMapPin, FiFileText, FiMail, FiImage } from 'react-icons/fi';
+import { FiGrid, FiBox, FiShoppingBag, FiLogOut, FiUser, FiHome, FiMenu, FiX, FiMapPin, FiMail, FiImage } from 'react-icons/fi';
 
 const Title = () => {
   const { pathname } = useLocation();
@@ -8,7 +8,6 @@ const Title = () => {
   if (pathname.startsWith('/admin/products')) return 'Products';
   if (pathname.startsWith('/admin/orders')) return 'Orders';
   if (pathname.startsWith('/admin/addresses')) return 'Addresses';
-  if (pathname.startsWith('/admin/policies')) return 'Policies';
   if (pathname.startsWith('/admin/contact-info')) return 'Contact Info';
   if (pathname.startsWith('/admin/logos')) return 'Logos';
   return 'Admin';
@@ -105,7 +104,6 @@ const AdminLayout = () => {
             {navItem('/admin/products', 'Products', FiBox, 'Manage catalog')}
             {navItem('/admin/orders', 'Orders', FiShoppingBag, 'Track orders')}
             {navItem('/admin/addresses', 'Addresses', FiMapPin, 'User addresses')}
-            {navItem('/admin/policies', 'Policies', FiFileText, 'Manage policies')}
             {navItem('/admin/contact-info', 'Contact Info', FiMail, 'Contact details')}
             {navItem('/admin/logos', 'Logos', FiImage, 'Manage logos')}
           </nav>
@@ -162,7 +160,6 @@ const AdminLayout = () => {
                 {navItem('/admin/products', 'Products', FiBox, 'Manage catalog')}
                 {navItem('/admin/orders', 'Orders', FiShoppingBag, 'Track orders')}
                 {navItem('/admin/addresses', 'Addresses', FiMapPin, 'User addresses')}
-                {navItem('/admin/policies', 'Policies', FiFileText, 'Manage policies')}
                 {navItem('/admin/contact-info', 'Contact Info', FiMail, 'Contact details')}
                 {navItem('/admin/logos', 'Logos', FiImage, 'Manage logos')}
               </nav>
