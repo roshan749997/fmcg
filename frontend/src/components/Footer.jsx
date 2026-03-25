@@ -119,18 +119,18 @@ const Footer = () => {
       `}</style>
       <footer className="w-full bg-white" style={{ color: '#1F2937' }}>
       {/* Trust Strip */}
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6" style={{ background: 'linear-gradient(135deg, rgba(255, 92, 168, 0.1) 0%, rgba(255, 182, 193, 0.1) 100%)' }}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-2.5 md:py-3" style={{ background: 'linear-gradient(135deg, rgba(255, 92, 168, 0.1) 0%, rgba(255, 182, 193, 0.1) 100%)' }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 sm:gap-2 md:gap-3 lg:gap-4">
           {trustFeatures.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
-              <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-white/5 rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 backdrop-blur-sm">
-                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 92, 168, 0.2)' }}>
-                  <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" style={{ color: '#FF5CA8' }} />
+              <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 bg-white/5 rounded-lg p-1.5 sm:p-2 backdrop-blur-sm">
+                <div className="flex-shrink-0 w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 92, 168, 0.2)' }}>
+                  <IconComponent className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" style={{ color: '#FF5CA8' }} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h6 className="font-semibold text-xs sm:text-sm md:text-base leading-tight" style={{ color: '#1F2937' }}>{feature.title}</h6>
-                  <p className="text-[10px] sm:text-xs md:text-sm opacity-80 leading-tight mt-0.5 sm:mt-1" style={{ color: '#1F2937' }}>{feature.description}</p>
+                  <h6 className="font-semibold text-[11px] sm:text-xs md:text-sm leading-tight" style={{ color: '#1F2937' }}>{feature.title}</h6>
+                  <p className="text-[9.5px] sm:text-[11px] md:text-xs opacity-80 leading-tight mt-0.5" style={{ color: '#1F2937' }}>{feature.description}</p>
                 </div>
               </div>
             );
@@ -139,11 +139,11 @@ const Footer = () => {
       </div>
 
       {/* Main Footer Content */}
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-4 2xl:px-6 py-8 sm:py-10 md:py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-4 2xl:px-6 py-4 sm:py-5 md:py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {/* Brand Section */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <div className="mb-4 sm:mb-6">
+            <div className="mb-3 sm:mb-4">
               <img 
                 src={footerLogo.url}
                 alt={footerLogo.alt || contactInfo.companyName}
@@ -154,8 +154,8 @@ const Footer = () => {
                   objectFit: 'contain',
                 }}
                 className={footerLogo.width === 'auto' && footerLogo.height === 'auto' 
-                  ? "h-50 sm:h-60 w-auto object-contain mb-10 sm:mb-4" 
-                  : "object-contain mb-10 sm:mb-4"}
+                  ? "h-36 sm:h-44 w-auto object-contain mb-4" 
+                  : "object-contain mb-4"}
                 onError={(e) => {
                   e.target.src = 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765609203/2_qw44ed.svg';
                 }}
@@ -222,7 +222,7 @@ const Footer = () => {
       </div>
 
       {/* Policy Links Section */}
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 bg-white">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 bg-white">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4">
           <Link 
             to="/privacy" 
@@ -256,7 +256,7 @@ const Footer = () => {
 
       {/* Bottom Footer Bar */}
       <div className="border-t" style={{ borderColor: 'rgba(229, 231, 235, 0.1)' }}>
-        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-4 2xl:px-6 py-4 sm:py-5 md:py-6">
+        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-4 2xl:px-6 py-2 sm:py-3 md:py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="text-xs sm:text-sm opacity-90 text-center sm:text-left" style={{ color: '#1F2937' }}>
               © {currentYear} {contactInfo.companyName}. All Rights Reserved
@@ -268,7 +268,7 @@ const Footer = () => {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 touch-manipulation"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 touch-manipulation"
                   style={{ 
                     backgroundColor: 'rgba(255, 92, 168, 0.2)',
                     color: '#1F2937'

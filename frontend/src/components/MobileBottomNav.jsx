@@ -158,7 +158,7 @@ const MobileBottomNav = () => {
       className={`fixed bottom-0 left-0 right-0 shadow-lg border-t-2 border-pink-200 md:hidden z-50 pt-2 pb-1 transition-transform duration-300 ${
         isFooterVisible ? 'translate-y-full' : 'translate-y-0'
       }`}
-      style={{ backgroundColor: '#e7dacf' }}
+      style={{ backgroundColor: '#FFFFFF' }}
     >
       <div className="flex justify-around items-center h-12">
         <a 

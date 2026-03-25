@@ -12,6 +12,14 @@ export const CartProvider = ({ children }) => {
   const hasToken = () => Boolean(localStorage.getItem('auth_token'));
 
   const mapServerCartToUI = useCallback((data) => {
+    const parseRupeeToNumber = (value) => {
+      if (typeof value === 'number') return value;
+      if (!value) return 0;
+      const numeric = String(value).replace(/[^0-9.]/g, '');
+      const parsed = Number(numeric);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
     const items = data?.items || [];
     return items.map((i) => {
       const p = i.product || {};
@@ -28,9 +36,10 @@ export const CartProvider = ({ children }) => {
         productKeys: Object.keys(p)
       });
       
+      const normalizedMrp = typeof p.mrp === 'number' ? p.mrp : parseRupeeToNumber(p.MRP);
       const price = typeof p.price === 'number'
         ? p.price
-        : (typeof p.mrp === 'number' ? Math.round(p.mrp - (p.mrp * (p.discountPercent || 0) / 100)) : 0);
+        : (normalizedMrp > 0 ? Math.round(normalizedMrp - (normalizedMrp * (p.discountPercent || 0) / 100)) : 0);
       
       // Get image URL - prefer image1, fallback to image2, image3, or legacy image field
       let imageUrl = null;
@@ -61,6 +70,11 @@ export const CartProvider = ({ children }) => {
           imageUrl = p.image.trim();
         }
       }
+
+      // Fallback to raw dataset key from Compass imports
+      if (!imageUrl && typeof p['Image Link'] === 'string' && p['Image Link'].trim() !== '') {
+        imageUrl = p['Image Link'].trim();
+      }
       
       console.log('Extracted image URL:', { 
         productId: p._id || p.id, 
@@ -70,12 +84,12 @@ export const CartProvider = ({ children }) => {
       
       return {
         id: p._id || p.id, // used by UI and for remove
-        name: p.title || p.name || 'Untitled Product',
+        name: p.title || p.name || p['SKU Name'] || 'Untitled Product',
         image: imageUrl, // Store the image URL string
         material: p.product_info?.fabric || p.product_info?.material || p.product_info?.shoeMaterial || p.product_info?.SareeMaterial,
         work: p.product_info?.includedComponents || p.product_info?.IncludedComponents,
         price,
-        originalPrice: p.mrp || p.originalPrice || price,
+        originalPrice: normalizedMrp || p.originalPrice || price,
         quantity: i.quantity || 1,
         size: i.size || null, // Include size from cart item
       };

@@ -56,7 +56,7 @@ const KidzoSections = () => {
     return (
       <section 
         className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
-        style={{ backgroundColor: '#E6D9F2' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
@@ -164,7 +164,7 @@ const KidzoSections = () => {
     return (
       <section 
         className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
-        style={{ backgroundColor: '#E6D9F2' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
@@ -275,7 +275,7 @@ const KidzoSections = () => {
     return (
       <section 
         className="py-6 sm:py-8 md:py-10 lg:py-12 px-1 sm:px-2 md:px-3 lg:px-4 w-full" 
-        style={{ backgroundColor: '#E6D9F2' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 px-2 sm:px-4">
@@ -328,7 +328,7 @@ const KidzoSections = () => {
     return (
       <section 
         className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
-        style={{ backgroundColor: '#E6D9F2' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
@@ -439,7 +439,7 @@ const KidzoSections = () => {
     return (
       <section 
         className="py-12 sm:py-16 md:py-20 lg:py-24 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
-        style={{ backgroundColor: '#E6D9F2' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-10 sm:mb-12 md:mb-16 px-2 sm:px-4">
@@ -503,7 +503,7 @@ const KidzoSections = () => {
     return (
       <section 
         className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
-        style={{ backgroundColor: '#E6D9F2' }}
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
@@ -577,7 +577,7 @@ const KidzoSections = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#E6D9F2' }}>
+    <div style={{ backgroundColor: '#FFFFFF' }}>
       <MainCategories />
       <FeaturedSection />
       <PremiumCollection />
