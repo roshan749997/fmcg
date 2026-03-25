@@ -13,16 +13,10 @@ import paymentRoutes from './routes/payment.routes.js';
 import addressRoutes from './routes/address.routes.js';
 import ordersRoutes from './routes/orders.routes.js';
 import adminRoutes from './routes/admin.routes.js';
-<<<<<<< Updated upstream
-
-import policyRoutes from './routes/policy.routes.js';
-=======
 import wishlistRoutes from './routes/wishlist.routes.js';
->>>>>>> Stashed changes
 import contactInfoRoutes from './routes/contactInfo.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import logoRoutes from './routes/logo.routes.js';
-import wishlistRoutes from './routes/wishlist.routes.js';
 
 import connectDB from './config/DataBaseConnection.js';
 import cookieJwtAuth from './middleware/authMiddleware.js';
@@ -78,16 +72,10 @@ server.use('/api/payment', paymentRoutes);
 server.use('/api/address', addressRoutes);
 server.use('/api/orders', ordersRoutes);
 server.use('/api/admin', adminRoutes);
-<<<<<<< Updated upstream
-
-server.use('/api/policies', policyRoutes);
-=======
 server.use('/api/wishlist', wishlistRoutes);
->>>>>>> Stashed changes
 server.use('/api/contact-info', contactInfoRoutes);
 server.use('/api/categories', categoryRoutes);
 server.use('/api/logos', logoRoutes);
-server.use('/api/wishlist', wishlistRoutes);
 
 const PORT = process.env.PORT || 5000;
 
