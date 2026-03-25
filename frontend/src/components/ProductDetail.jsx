@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fetchSareeById, fetchSarees } from '../services/api';
+import { useWishlist } from '../context/WishlistContext';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
-import { FaRupeeSign, FaSpinner, FaStar, FaRegStar } from 'react-icons/fa';
+import { FaRupeeSign, FaSpinner, FaStar, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
 import ScrollToTop from './ScrollToTop';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -46,8 +47,19 @@ const ProductCard = ({ product }) => {
   const imageUrl = Array.isArray(productImages) && productImages.length > 0 
     ? (typeof productImages[0] === 'string' ? productImages[0] : productImages[0].url || placeholders.productList)
     : getProductImage(product, 'image1');
-  const finalPrice = product.finalPrice || product.price || (product.mrp ? product.mrp - (product.mrp * (product.discountPercent || 0) / 100) : 0);
-  const originalPrice = product.originalPrice || product.mrp || product.price || 0;
+  const parseRupeeValue = (value) => {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+    const numeric = String(value).replace(/[^0-9.]/g, '');
+    const parsed = Number(numeric);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const finalPrice = product.finalPrice || product.price || (() => {
+    const mrp = parseRupeeValue(product.mrp || product.sourceData?.mrp);
+    const discountPercent = product.discountPercent || 0;
+    return Math.round(mrp - (mrp * discountPercent / 100));
+  })();
+  const originalPrice = parseRupeeValue(product.originalPrice || product.mrp || product.price || 0);
   const discountPercent = product.discountPercent || (originalPrice > finalPrice ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0);
 
   return (
@@ -103,6 +115,15 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist, isTogglingWishlist, wishlistError } = useWishlist();
+  const parseRupeeValue = (value) => {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+    const numeric = String(value).replace(/[^0-9.]/g, '');
+    const parsed = Number(numeric);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  
   const isAuthenticated = () => {
     try {
       return Boolean(localStorage.getItem('auth_token'));
@@ -438,10 +459,14 @@ const ProductDetail = () => {
   const currentImage = images[selectedImageIndex] || images[0] || placeholders.productDetail;
   const imageUrl = typeof currentImage === 'string' ? currentImage : (currentImage?.url || placeholders.productDetail);
   
-  const finalPrice = product.finalPrice || product.price || (product.mrp ? product.mrp - (product.mrp * (product.discountPercent || 0) / 100) : 0);
-  const originalPrice = product.originalPrice || product.mrp || product.price || 0;
+  const finalPrice = product.finalPrice || product.price || (() => {
+    const mrp = parseRupeeValue(product.mrp || product.sourceData?.mrp);
+    const discountPercent = product.discountPercent || 0;
+    return Math.round(mrp - (mrp * discountPercent / 100));
+  })();
+  const originalPrice = parseRupeeValue(product.originalPrice || product.mrp || product.price || 0);
   const discountPercent = originalPrice > finalPrice ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : (product.discountPercent || 0);
-  const productTitle = product.name || product.title || 'Product';
+  const productTitle = product.name || product.title || product.sourceData?.skuName || 'Product';
   const productBrand = product.brand || product.product_info?.brand || product.product_info?.manufacturer || '';
   const productDescription = product.description || product.productDetails?.description || '';
   const productCategory = product.category || '';
@@ -463,6 +488,19 @@ const ProductDetail = () => {
   
   // Keep a clean, readable title style across all products
   const displayTitle = productTitle;
+
+  const productId = product._id || product.id;
+  const wishlisted = isInWishlist(productId);
+  const wishlistPending = isTogglingWishlist(productId);
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated()) return setShowLoginModal(true);
+    try {
+      await toggleWishlist(product);
+    } catch {
+      // Context stores a message in `wishlistError` (and reverts optimistic state on failure)
+    }
+  };
 
   return (
     <>
@@ -613,10 +651,51 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-semibold text-[#212121]">₹{Math.round(finalPrice).toLocaleString()}</span>
-                {originalPrice > finalPrice && <span className="text-base text-[#878787] line-through">₹{Math.round(originalPrice).toLocaleString()}</span>}
-                {discountPercent > 0 && <span className="text-base font-semibold text-[#388e3c]">{discountPercent}% off</span>}
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-3xl font-semibold text-[#212121]">
+                    ₹{Math.round(finalPrice).toLocaleString()}
+                  </span>
+                  {originalPrice > finalPrice && (
+                    <span className="text-base text-[#878787] line-through">
+                      ₹{Math.round(originalPrice).toLocaleString()}
+                    </span>
+                  )}
+                  {discountPercent > 0 && (
+                    <span className="text-base font-semibold text-[#388e3c]">
+                      {discountPercent}% off
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col items-end">
+                  <button
+                    type="button"
+                    onClick={handleWishlistToggle}
+                    disabled={wishlistPending}
+                    aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                    className={`shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-full border transition-all ${
+                      wishlisted
+                        ? 'border-pink-200 bg-pink-50 hover:bg-pink-100 text-[#E91E63]'
+                        : 'border-gray-200 bg-white hover:bg-gray-50 text-black'
+                    } ${wishlistPending ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                  >
+                    {wishlistPending ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : wishlisted ? (
+                      <FaHeart className="text-lg" />
+                    ) : (
+                      <FaRegHeart className="text-lg" />
+                    )}
+                  </button>
+
+                  {wishlistError && (
+                    <p className="text-xs text-red-600 mt-1 leading-tight max-w-[220px] text-right">
+                      {wishlistError}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="border border-[#f0f0f0] rounded-sm p-3 bg-[#fcfcfc]">
@@ -852,19 +931,23 @@ const ProductDetail = () => {
       </div>
 
       {/* Mobile sticky purchase bar */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 p-2 grid grid-cols-2 gap-2 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
-        <button
-          onClick={handleAddToCart}
-          className="h-11 bg-[#ff9f00] text-white text-sm font-semibold rounded-sm"
-        >
-          ADD TO CART
-        </button>
-        <button
-          onClick={handleBuyNow}
-          className="h-11 bg-[#fb641b] text-white text-sm font-semibold rounded-sm"
-        >
-          BUY NOW
-        </button>
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
+        <div className="p-2">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleAddToCart}
+              className="h-11 bg-[#ff9f00] text-white text-sm font-semibold rounded-sm"
+            >
+              ADD TO CART
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="h-11 bg-[#fb641b] text-white text-sm font-semibold rounded-sm"
+            >
+              BUY NOW
+            </button>
+          </div>
+        </div>
       </div>
       
       <style>{`

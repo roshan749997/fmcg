@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { CartProvider } from '../context/CartContext';
+import { WishlistProvider } from '../context/WishlistContext';
 import Layout from '../components/Layout';
 import Home from '../pages/Home';
 import Shop from '../pages/Shop';
@@ -18,7 +19,6 @@ import Address from '../pages/Address';
 import Search from '../pages/Search';
 import MobileBottomNav from '../components/MobileBottomNav';
 import { useEffect } from 'react';
-import Wishlist from '../pages/Wishlist';
 import AuthSuccess from '../pages/AuthSuccess';
 import AuthFailure from '../pages/AuthFailure';
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -34,6 +34,7 @@ import TermsAndConditions from '../pages/TermsAndConditions';
 import ShippingPolicy from '../pages/ShippingPolicy';
 import RefundCancellationPolicy from '../pages/RefundCancellationPolicy';
 import OrderSuccess from '../pages/OrderSuccess';
+import Wishlist from '../pages/Wishlist';
 
 const isAuthenticated = () => {
   try {
@@ -99,13 +100,14 @@ const Router = () => {
 
   return (
     <CartProvider>
-      <Routes location={routesLocation}>
-        <Route path="/" element={
-          <>
-            <Layout />
-            {!hideBottomNav && <MobileBottomNav />}
-          </>
-        }>
+      <WishlistProvider>
+        <Routes location={routesLocation}>
+          <Route path="/" element={
+            <>
+              <Layout />
+              {!hideBottomNav && <MobileBottomNav />}
+            </>
+          }>
           {/* Public routes */}
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
@@ -126,7 +128,6 @@ const Router = () => {
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
-          <Route path="wishlist" element={<Wishlist />} />
           <Route path="privacy" element={<PrivacyPolicy />} />
           <Route path="terms" element={<TermsAndConditions />} />
           <Route path="shipping" element={<ShippingPolicy />} />
@@ -138,24 +139,26 @@ const Router = () => {
           <Route path="checkout/address" element={<RequireAuth><Address /></RequireAuth>} />
           <Route path="order-success" element={<RequireAuth><OrderSuccess /></RequireAuth>} />
           <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
+          <Route path="wishlist" element={<RequireAuth><Wishlist /></RequireAuth>} />
           <Route path="search" element={<Search />} />
-        </Route>
+          </Route>
 
-        <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="auth/success" element={<AuthSuccess />} />
-        <Route path="auth/failure" element={<AuthFailure />} />
-        {/* Admin routes */}
-        <Route path="admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="addresses" element={<AdminAddresses />} />
-          <Route path="policies" element={<AdminPolicies />} />
-          <Route path="contact-info" element={<AdminContactInfo />} />
-          <Route path="logos" element={<AdminLogos />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="auth/success" element={<AuthSuccess />} />
+          <Route path="auth/failure" element={<AuthFailure />} />
+          {/* Admin routes */}
+          <Route path="admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="addresses" element={<AdminAddresses />} />
+            <Route path="policies" element={<AdminPolicies />} />
+            <Route path="contact-info" element={<AdminContactInfo />} />
+            <Route path="logos" element={<AdminLogos />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </WishlistProvider>
 
       {backgroundLocation && (
         <Routes>

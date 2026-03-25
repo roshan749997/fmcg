@@ -1,25 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 // SVG Icons with black color
 const HomeIcon = ({ isActive }) => (
   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path 
       d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15"
-      stroke="#000000" 
-      strokeWidth="2.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      fill="none"
-    />
-  </svg>
-);
-
-const WishlistIcon = ({ isActive }) => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path 
-      d="M20.84 4.60999C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.60999L12 5.66999L10.94 4.60999C9.9083 3.5783 8.50903 2.9987 7.05 2.9987C5.59096 2.9987 4.19169 3.5783 3.16 4.60999C2.1283 5.64169 1.54871 7.04096 1.54871 8.49999C1.54871 9.95903 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6053C22.3095 9.93789 22.4518 9.22248 22.4518 8.49999C22.4518 7.77751 22.3095 7.0621 22.0329 6.39464C21.7563 5.72718 21.351 5.12087 20.84 4.60999V4.60999Z"
       stroke="#000000" 
       strokeWidth="2.5" 
       strokeLinecap="round" 
@@ -79,46 +67,25 @@ const AccountIcon = ({ isActive }) => (
   </svg>
 );
 
+const WishlistIcon = ({ isActive }) => (
+  <svg className="w-5 h-5" viewBox="0 0 24 24" fill={isActive ? '#000000' : 'none'} xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+      stroke="#000000"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const MobileBottomNav = () => {
   const { cartCount } = useCart();
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const { wishlistCount } = useWishlist();
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Read wishlist count from localStorage
-  useEffect(() => {
-    const readWishlistCount = () => {
-      try {
-        const raw = localStorage.getItem('wishlist');
-        const list = raw ? JSON.parse(raw) : [];
-        setWishlistCount(Array.isArray(list) ? list.length : 0);
-      } catch {
-        setWishlistCount(0);
-      }
-    };
-    
-    readWishlistCount();
-    
-    const onStorage = (e) => {
-      if (!e || e.key === 'wishlist') {
-        readWishlistCount();
-      }
-    };
-    
-    const onCustom = () => {
-      readWishlistCount();
-    };
-    
-    window.addEventListener('storage', onStorage);
-    window.addEventListener('wishlist:updated', onCustom);
-    
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener('wishlist:updated', onCustom);
-    };
-  }, []);
-
   // Detect footer visibility using Intersection Observer
   useEffect(() => {
     const footer = document.querySelector('footer');

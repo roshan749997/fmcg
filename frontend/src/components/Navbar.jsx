@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { searchProducts } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
 import { navbarCategories } from '../data/categoryTree';
@@ -19,7 +20,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { cartCount } = useCart();
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const { wishlistCount } = useWishlist();
   const [bannerIndex, setBannerIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [userInitial, setUserInitial] = useState('');
@@ -89,30 +90,6 @@ const Navbar = () => {
 
     window.addEventListener('bannerChanged', handleBannerChange);
     return () => window.removeEventListener('bannerChanged', handleBannerChange);
-  }, []);
-
-  useEffect(() => {
-    const loadWishlistCount = async () => {
-      try {
-        const { getWishlistCount } = await import('../services/api');
-        const data = await getWishlistCount();
-        setWishlistCount(data.count || 0);
-      } catch {
-        setWishlistCount(0);
-      }
-    };
-    
-    loadWishlistCount();
-    
-    // Listen for wishlist updates (from custom event)
-    const onWishlistUpdated = () => {
-      loadWishlistCount();
-    };
-    
-    window.addEventListener('wishlist:updated', onWishlistUpdated);
-    return () => {
-      window.removeEventListener('wishlist:updated', onWishlistUpdated);
-    };
   }, []);
 
   // Check authentication status and get user initial
@@ -537,18 +514,6 @@ const Navbar = () => {
                 )}
               </div>
 
-              {/* Wishlist Icon - Hidden on Mobile, Visible on Desktop */}
-              <Link to="/wishlist" className="hidden md:flex p-1.5 sm:p-2 md:p-2.5 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 hover:text-pink-700 relative transition-all duration-200 hover:scale-110 group touch-manipulation">
-                <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-pink-500 text-white text-[10px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-bold shadow-lg border border-white">
-                    {wishlistCount > 9 ? '9+' : wishlistCount}
-                  </span>
-                )}
-              </Link>
-
               {/* Cart Icon - Always Visible */}
               <Link to="/cart" className="p-1.5 sm:p-2 md:p-2.5 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 hover:text-purple-700 relative transition-all duration-200 hover:scale-110 group touch-manipulation">
                 <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -560,6 +525,21 @@ const Navbar = () => {
                   </span>
                 )}
               </Link>
+
+              {/* Wishlist Icon - Always Visible */}
+              <NavLink
+                to="/wishlist"
+                className="p-1.5 sm:p-2 md:p-2.5 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 hover:text-pink-700 relative transition-all duration-200 hover:scale-110 group touch-manipulation"
+              >
+                <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-[#5c9404] to-[#8B2BE2] text-white text-[10px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-bold shadow-lg border border-white">
+                    {wishlistCount > 9 ? '9+' : wishlistCount}
+                  </span>
+                )}
+              </NavLink>
 
               {/* My Account Icon / User Profile Picture - Hidden on Mobile, Visible on Desktop */}
               {isAuthenticated && userInitial ? (
@@ -656,24 +636,7 @@ const Navbar = () => {
 
             {/* Mobile Menu Icons Section */}
             <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 px-3 sm:px-4 border-t border-gray-200">
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {/* Wishlist - Mobile Only */}
-                <Link
-                  to="/wishlist"
-                  className="bg-white border border-gray-300 rounded-lg py-3 sm:py-4 px-3 sm:px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 active:bg-gray-100 transition-all duration-200 touch-manipulation shadow-sm"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                  </svg>
-                  <span className="font-bold text-xs sm:text-sm text-black">Wishlist</span>
-                  {wishlistCount > 0 && (
-                    <span className="bg-pink-500 text-white text-[10px] sm:text-xs rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center font-bold">
-                      {wishlistCount > 9 ? '9+' : wishlistCount}
-                    </span>
-                  )}
-                </Link>
-
+              <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {/* Profile - Mobile Only */}
                 {isAuthenticated && userInitial ? (
                   <Link

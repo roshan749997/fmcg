@@ -1,22 +1,17 @@
 import { Router } from 'express';
-import auth from '../middleware/auth.js';
-import { getWishlist, addToWishlist, removeFromWishlist, getWishlistCount } from '../controllers/wishlist.controller.js';
+import cookieJwtAuth from '../middleware/authMiddleware.js';
+import { addToWishlist, removeFromWishlist, getWishlist } from '../controllers/wishlist.controller.js';
 
 const router = Router();
 
-// All routes require authentication
-router.get('/', auth, getWishlist);
-router.post('/add', auth, addToWishlist);
-router.delete('/remove/:productId', auth, removeFromWishlist);
-router.get('/count', auth, getWishlistCount);
+// POST /api/wishlist/add
+router.post('/add', cookieJwtAuth, addToWishlist);
+
+// DELETE /api/wishlist/remove/:productId
+router.delete('/remove/:productId', cookieJwtAuth, removeFromWishlist);
+
+// GET /api/wishlist
+router.get('/', cookieJwtAuth, getWishlist);
 
 export default router;
-
-
-
-
-
-
-
-
 

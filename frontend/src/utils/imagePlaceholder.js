@@ -54,6 +54,11 @@ export const getProductImage = (product, imageKey = 'image1') => {
     return product.image;
   }
 
+  // Check sourceData.imageLink for raw product data
+  if (product.sourceData?.imageLink && typeof product.sourceData.imageLink === 'string') {
+    return product.sourceData.imageLink;
+  }
+
   if (!product.images) {
     return placeholders.productList;
   }

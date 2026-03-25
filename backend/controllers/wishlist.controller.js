@@ -1,130 +1,97 @@
+import mongoose from 'mongoose';
 import Wishlist from '../models/Wishlist.js';
 import { Product } from '../models/product.js';
-import mongoose from 'mongoose';
 
-// GET /api/wishlist -> Get user's wishlist
-export const getWishlist = async (req, res) => {
-  try {
-    const userId = req.userId;
-    if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    const wishlist = await Wishlist.findOne({ user: userId }).populate({
-      path: 'items.product',
-      match: { _id: { $exists: true } } // Only populate if product exists
-    });
-    
-    // Filter out items where product was deleted (null after populate)
-    if (wishlist && wishlist.items) {
-      wishlist.items = wishlist.items.filter(item => item.product !== null);
-      await wishlist.save(); // Save to remove deleted products
-    }
-    
-    return res.json(wishlist || { user: userId, items: [] });
-  } catch (error) {
-    console.error('Error fetching wishlist:', error);
-    return res.status(500).json({ message: 'Failed to fetch wishlist', error: error.message });
-  }
+const getUserId = (req) => {
+  // `authMiddleware.js` sets `req.user` (Mongoose doc) and `req.userId` (string).
+  // Some other middleware versions might only set `req.userId`.
+  return req.user?._id || req.userId || null;
 };
 
-// POST /api/wishlist/add -> Add product to wishlist
+/**
+ * POST /api/wishlist/add
+ * Body: { productId }
+ *
+ * Adds product to user's wishlist (no duplicates).
+ */
 export const addToWishlist = async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+    const userId = getUserId(req);
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const { productId } = req.body || {};
-    if (!productId) {
-      return res.status(400).json({ message: 'productId is required' });
-    }
-    
-    // Validate productId format
-    if (!mongoose.isValidObjectId(productId)) {
-      return res.status(400).json({ message: 'Invalid productId format' });
+    if (!productId || !mongoose.isValidObjectId(productId)) {
+      return res.status(400).json({ message: 'Invalid productId' });
     }
 
-    // Verify product exists
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    // Ensure product exists (prevents populating null and gives nicer UX)
+    const productExists = await Product.exists({ _id: productId });
+    if (!productExists) return res.status(404).json({ message: 'Product not found' });
 
-    let wishlist = await Wishlist.findOne({ user: userId });
-    if (!wishlist) {
-      wishlist = new Wishlist({ user: userId, items: [] });
-    }
+    // $addToSet avoids duplicates at DB-level
+    const wishlist = await Wishlist.findOneAndUpdate(
+      { user: userId },
+      { $addToSet: { products: productId } },
+      { new: true, upsert: true }
+    ).populate('products');
 
-    // Check if product already exists in wishlist
-    const exists = wishlist.items.some(
-      item => item.product.toString() === productId
-    );
-
-    if (!exists) {
-      wishlist.items.push({ product: productId });
-      await wishlist.save();
-    }
-
-    const populated = await wishlist.populate('items.product');
-    return res.json(populated);
-  } catch (error) {
-    console.error('Error adding to wishlist:', error);
-    return res.status(500).json({ message: 'Failed to add to wishlist', error: error.message });
+    return res.json({
+      products: wishlist?.products || [],
+      count: wishlist?.products?.length || 0,
+    });
+  } catch (err) {
+    console.error('[addToWishlist] Error:', err);
+    return res.status(500).json({ message: 'Failed to add to wishlist', error: err.message });
   }
 };
 
-// DELETE /api/wishlist/remove/:productId -> Remove product from wishlist
+/**
+ * DELETE /api/wishlist/remove/:productId
+ */
 export const removeFromWishlist = async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+    const userId = getUserId(req);
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const { productId } = req.params || {};
+    if (!productId || !mongoose.isValidObjectId(productId)) {
+      return res.status(400).json({ message: 'Invalid productId' });
     }
 
-    const { productId } = req.params;
-    if (!productId) {
-      return res.status(400).json({ message: 'productId is required' });
-    }
-    
-    // Validate productId format
-    if (!mongoose.isValidObjectId(productId)) {
-      return res.status(400).json({ message: 'Invalid productId format' });
-    }
+    const wishlist = await Wishlist.findOneAndUpdate(
+      { user: userId },
+      { $pull: { products: productId } },
+      { new: true }
+    ).populate('products');
 
-    const wishlist = await Wishlist.findOne({ user: userId });
-    if (!wishlist) {
-      return res.json({ user: userId, items: [] });
-    }
-
-    wishlist.items = wishlist.items.filter(
-      item => item.product.toString() !== productId
-    );
-    await wishlist.save();
-
-    const populated = await wishlist.populate('items.product');
-    return res.json(populated);
-  } catch (error) {
-    console.error('Error removing from wishlist:', error);
-    return res.status(500).json({ message: 'Failed to remove from wishlist', error: error.message });
+    return res.json({
+      products: wishlist?.products || [],
+      count: wishlist?.products?.length || 0,
+    });
+  } catch (err) {
+    console.error('[removeFromWishlist] Error:', err);
+    return res.status(500).json({ message: 'Failed to remove from wishlist', error: err.message });
   }
 };
 
-// GET /api/wishlist/count -> Get wishlist item count
-export const getWishlistCount = async (req, res) => {
+/**
+ * GET /api/wishlist
+ * Returns populated product docs for the logged-in user.
+ */
+export const getWishlist = async (req, res) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
-      return res.json({ count: 0 });
-    }
+    const userId = getUserId(req);
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-    const wishlist = await Wishlist.findOne({ user: userId });
-    const count = wishlist ? wishlist.items.length : 0;
-    return res.json({ count });
-  } catch (error) {
-    console.error('Error getting wishlist count:', error);
-    return res.json({ count: 0 });
+    const wishlist = await Wishlist.findOne({ user: userId }).populate('products');
+
+    return res.json({
+      products: wishlist?.products || [],
+      count: wishlist?.products?.length || 0,
+    });
+  } catch (err) {
+    console.error('[getWishlist] Error:', err);
+    return res.status(500).json({ message: 'Failed to fetch wishlist', error: err.message });
   }
 };
 
