@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { wishlistApi } from '../services/wishlistApi';
 import { getProductImage, placeholders } from '../utils/imagePlaceholder';
+import { fetchSareeById } from '../services/api';
 
 const WishlistContext = createContext(null);
 
@@ -31,6 +32,20 @@ const normalizeProduct = (p) => {
     originalPrice: p.originalPrice ?? mrp ?? 0,
     product: p,
   };
+};
+
+const getProductId = (item) => {
+  if (!item) return null;
+  if (typeof item === 'string' || typeof item === 'number') return item.toString();
+  return item._id ? item._id.toString() : item.id ? item.id.toString() : null;
+};
+
+const isHydratedProduct = (p) => {
+  if (!p || typeof p !== 'object') return false;
+  const hasName = Boolean(p.title || p.name || p.sourceData?.skuName);
+  const hasPricing = p.mrp != null || p.price != null || p.finalPrice != null;
+  const hasImage = Boolean(p.images?.image1 || p.image || p.sourceData?.imageLink);
+  return hasName && (hasPricing || hasImage);
 };
 
 export const WishlistProvider = ({ children }) => {
@@ -71,6 +86,34 @@ export const WishlistProvider = ({ children }) => {
     window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { authenticated: false } }));
   }, []);
 
+  const hydrateWishlistProducts = useCallback(async (rawProducts) => {
+    const list = Array.isArray(rawProducts) ? rawProducts : [];
+    if (list.length === 0) return [];
+
+    const needsHydration = list.some((p) => !isHydratedProduct(p));
+    if (!needsHydration) return list;
+
+    const ids = list.map(getProductId);
+    const results = await Promise.allSettled(
+      ids.map((id, idx) => {
+        const raw = list[idx];
+        if (!id) return Promise.resolve(raw);
+        if (isHydratedProduct(raw)) return Promise.resolve(raw);
+        return fetchSareeById(id).catch(() => raw);
+      })
+    );
+
+    return results.map((r, idx) => (r.status === 'fulfilled' ? r.value : list[idx]));
+  }, []);
+
+  const setWishlistFromApiProducts = useCallback(
+    async (rawProducts) => {
+      const hydrated = await hydrateWishlistProducts(rawProducts);
+      setWishlistItems(hydrated.map(normalizeProduct).filter(Boolean));
+    },
+    [hydrateWishlistProducts]
+  );
+
   const loadWishlist = useCallback(async () => {
     if (!hasAuthToken()) {
       setWishlistItems([]);
@@ -83,7 +126,7 @@ export const WishlistProvider = ({ children }) => {
     try {
       // wishlistApi.getWishlist() returns the products array
       const products = (await wishlistApi.getWishlist()) || [];
-      setWishlistItems(products.map(normalizeProduct).filter(Boolean));
+      await setWishlistFromApiProducts(products);
     } catch (err) {
       const status = err?.response?.status;
       if (status === 401) {
@@ -95,7 +138,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setWishlistLoading(false);
     }
-  }, [handle401]);
+  }, [handle401, setWishlistFromApiProducts]);
 
   useEffect(() => {
     loadWishlist();
@@ -124,7 +167,7 @@ export const WishlistProvider = ({ children }) => {
       try {
         const data = await wishlistApi.addToWishlist(pid);
         const products = data?.products || [];
-        setWishlistItems(products.map(normalizeProduct).filter(Boolean));
+        await setWishlistFromApiProducts(products);
       } catch (err) {
         const status = err?.response?.status;
         setWishlistItems(prevSnapshot);
@@ -135,7 +178,7 @@ export const WishlistProvider = ({ children }) => {
         setToggleLoadingIds((ids) => ids.filter((id) => id !== pid));
       }
     },
-    [handle401, isInWishlist, wishlistItems]
+    [handle401, isInWishlist, setWishlistFromApiProducts, wishlistItems]
   );
 
   const removeFromWishlist = useCallback(
@@ -153,7 +196,7 @@ export const WishlistProvider = ({ children }) => {
       try {
         const data = await wishlistApi.removeFromWishlist(pid);
         const products = data?.products || [];
-        setWishlistItems(products.map(normalizeProduct).filter(Boolean));
+        await setWishlistFromApiProducts(products);
       } catch (err) {
         const status = err?.response?.status;
         setWishlistItems(prevSnapshot);
@@ -164,7 +207,7 @@ export const WishlistProvider = ({ children }) => {
         setToggleLoadingIds((ids) => ids.filter((id) => id !== pid));
       }
     },
-    [handle401, isInWishlist, wishlistItems]
+    [handle401, isInWishlist, setWishlistFromApiProducts, wishlistItems]
   );
 
   const toggleWishlist = useCallback(
