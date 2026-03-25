@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTruck, FaAward, FaShieldAlt, FaUndo } from 'react-icons/fa';
 
@@ -30,106 +30,62 @@ const KidzoSections = () => {
       { 
         name: 'Bath & Hand Wash', 
         icon: '🚙', 
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774423858/8140e669-2bc1-4c63-9f43-ce249342ebc2.png', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432921/06cf0047-6bdd-4f41-8f50-0ab1b54fce56.png',
         path: '/category/beauty-and-hygiene/bath-and-hand-wash' 
       },
       { 
         name: 'Tea', 
         icon: '🚜', 
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774425891/7486c102-b821-4cde-8c58-8f127b79b767.png', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433003/f03b9c61-41ad-4a20-b503-9bbd9c6c5ce0.png', 
         path: '/category/beverages/tea' 
       },
       { 
         name: "Men's Grooming", 
         icon: '🏎️', 
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774425536/a3179ec5-4267-4e39-a412-6e6ceb0ce516.png', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433251/c82f0fd1-2136-4508-aeb1-1d85721df43b.png', 
         path: '/category/beauty-and-hygiene/mens-grooming' 
       },
       { 
         name: 'Hair Care', 
         icon: '🔥', 
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774425967/3ddf5209-ba06-40f3-8d09-5d6fb3ea362e.png', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433102/9abba838-a920-4a7d-a0ff-47ec24bbbc9e.png', 
         path: '/category/beauty-and-hygiene/hair-care' 
       },
       { 
         name: 'Fragrances & Deos', 
         icon: '💫', 
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774426135/4501126f-941c-4c6f-9bb8-8adc890de203.png', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433220/8323916c-168e-4dec-9d82-3d8546f016c1.png', 
         path: '/category/beauty-and-hygiene/fragrances-and-deos' 
       },
       {
         name: 'Sports & Fitness',
         icon: '🏃‍♂️',
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432057/e41e6d8b-f963-4abd-b9f7-c619c9ebe8f0.png',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433316/343306bf-6e49-4e96-ab4a-cc415586a0bf.png',
         path: '/category/cleaning-and-household/sports-and-fitness'
       },
       {
         name: 'Toys & Games',
         icon: '🧸',
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432198/cd1f92b8-dd04-41e6-92ba-2dd38fbcbb16.png',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433721/67856f20-b70f-4712-8161-b765d63f2e0f.png',
         path: '/category/cleaning-and-household/toys-and-games'
       },
       {
         name: 'Bins & Bathroom Ware',
         icon: '🧺',
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432238/f8a94dec-5e6d-48a5-a6af-e75add435ee5.png',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774433767/2ddf1c7c-8b08-49b8-98e9-7966fbdd95cc.png',
         path: '/category/cleaning-and-household/bins-and-bathroom-ware'
       }
     ];
 
-    const carouselRef = useRef(null);
-    const [isPaused, setIsPaused] = useState(false);
-
-    const scrollPrev = () => {
-      const el = carouselRef.current;
-      if (!el) return;
-      const maxScrollLeft = el.scrollWidth - el.clientWidth;
-      const step = el.clientWidth;
-      const target = el.scrollLeft - step;
-      if (target <= 0) {
-        el.scrollLeft = Math.max(0, maxScrollLeft);
-      } else {
-        el.scrollBy({ left: -step, behavior: 'smooth' });
-      }
-    };
-
-    const scrollNext = () => {
-      const el = carouselRef.current;
-      if (!el) return;
-      const maxScrollLeft = el.scrollWidth - el.clientWidth;
-      const step = el.clientWidth;
-      const target = el.scrollLeft + step;
-      if (target >= maxScrollLeft - 1) {
-        el.scrollLeft = 0;
-      } else {
-        el.scrollBy({ left: step, behavior: 'smooth' });
-      }
-    };
-
-    useEffect(() => {
-      const id = window.setInterval(() => {
-        if (isPaused) return;
-        const el = carouselRef.current;
-        if (!el) return;
-        const maxScrollLeft = el.scrollWidth - el.clientWidth;
-        const step = el.clientWidth;
-        const target = el.scrollLeft + step;
-        if (target >= maxScrollLeft - 1) el.scrollLeft = 0;
-        else el.scrollBy({ left: step, behavior: 'smooth' });
-      }, 3000);
-
-      return () => window.clearInterval(id);
-    }, [isPaused]);
-
     return (
       <section 
-        className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
+        className="pt-6 pb-5 sm:pt-8 sm:pb-5 md:pt-10 md:pb-5 lg:pt-12 lg:pb-7 px-2 sm:px-4 md:px-6 lg:px-8 w-full"
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
-          <div className="text-center mb-4 sm:mb-6 md:mb-8 px-2 sm:px-4">
+          <div className="text-center mb-2 sm:mb-3 md:mb-4 px-2 sm:px-4">
             <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-1 sm:mb-2 uppercase" 
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-0 sm:mb-1 uppercase" 
               style={{ 
                 fontFamily: "'Bebas Neue', sans-serif", 
                 letterSpacing: '2px', 
@@ -139,71 +95,32 @@ const KidzoSections = () => {
               SHOP BY CATEGORY
             </h2>
           </div>
-
-          <div className="relative px-2 sm:px-4">
-            <button
-              type="button"
-              aria-label="Previous categories"
-              onClick={() => {
-                setIsPaused(true);
-                scrollPrev();
-                window.setTimeout(() => setIsPaused(false), 1200);
-              }}
-              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              aria-label="Next categories"
-              onClick={() => {
-                setIsPaused(true);
-                scrollNext();
-                window.setTimeout(() => setIsPaused(false), 1200);
-              }}
-              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            <div
-              ref={carouselRef}
-              className="flex gap-2 sm:gap-3 md:gap-4 lg:gap-5 overflow-x-auto scroll-smooth py-1 hide-scrollbar"
-              style={{ scrollSnapType: 'x mandatory' }}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              {categories.map((category, index) => (
-                <div
-                  key={index}
-                  className="group cursor-pointer snap-start w-[140px] sm:w-[170px] md:w-[190px] lg:w-[210px] flex-shrink-0"
-                  onClick={() => handleCategoryClick(category.path)}
-                >
-                  <div className="relative aspect-square bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:scale-105">
-                    <div className="absolute inset-0 bg-gray-100">
-                      <img
-                        src={category.image}
-                        alt={category.name}
-                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/200x200/1F2937/FFFFFF?text=Car';
-                        }}
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 lg:gap-5 px-2 sm:px-4">
+            {categories.map((category, index) => (
+              <div
+                key={index}
+                className="group cursor-pointer"
+                onClick={() => handleCategoryClick(category.path)}
+              >
+                <div className="relative aspect-square bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:scale-105">
+                  <div className="absolute inset-0 bg-gray-100">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/200x200/1F2937/FFFFFF?text=Car';
+                      }}
+                    />
                   </div>
-                  <h3 className="text-center mt-3 text-xs sm:text-sm md:text-base font-semibold text-gray-900 group-hover:text-[#02050B] transition-colors duration-300">
-                    {category.name}
-                  </h3>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-              ))}
-            </div>
+                <h3 className="text-center mt-3 text-xs sm:text-sm md:text-base font-semibold text-gray-900 group-hover:text-[#02050B] transition-colors duration-300">
+                  {category.name}
+                </h3>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -237,13 +154,13 @@ const KidzoSections = () => {
 
     return (
       <section 
-        className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
+        className="pt-4 pb-6 sm:pt-4 sm:pb-7 md:pt-5 md:pb-8 lg:pt-6 lg:pb-10 px-2 sm:px-4 md:px-6 lg:px-8 w-full"
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
-          <div className="text-center mb-4 sm:mb-6 md:mb-8 px-2 sm:px-4">
+          <div className="text-center mb-2 sm:mb-3 md:mb-4 px-2 sm:px-4">
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-1 sm:mb-2 uppercase"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-0 sm:mb-1 uppercase"
               style={{
                 fontFamily: "'Bebas Neue', sans-serif",
                 letterSpacing: '2px',
