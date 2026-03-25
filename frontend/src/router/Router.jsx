@@ -86,13 +86,20 @@ const RedirectIfAuth = ({ children }) => {
 
 const Router = () => {
   const location = useLocation();
+  const isAuthRoute = location.pathname === '/signin' || location.pathname === '/signup';
+  const backgroundLocationFromState = location.state?.backgroundLocation;
+  const fallbackBackgroundLocation = isAuthRoute
+    ? { ...location, pathname: '/', search: '', hash: '', state: null, key: 'auth-default-bg' }
+    : null;
+  const backgroundLocation = backgroundLocationFromState || fallbackBackgroundLocation;
+  const routesLocation = backgroundLocation || location;
   const hideBottomNav = location.pathname.includes('/product/') || 
                        location.pathname === '/products' || 
                        location.pathname.startsWith('/category/');
 
   return (
     <CartProvider>
-      <Routes>
+      <Routes location={routesLocation}>
         <Route path="/" element={
           <>
             <Layout />
@@ -134,8 +141,6 @@ const Router = () => {
           <Route path="search" element={<Search />} />
         </Route>
 
-        <Route path="signin" element={<RedirectIfAuth><SignIn /></RedirectIfAuth>} />
-        <Route path="signup" element={<RedirectIfAuth><SignUp /></RedirectIfAuth>} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="auth/success" element={<AuthSuccess />} />
         <Route path="auth/failure" element={<AuthFailure />} />
@@ -151,6 +156,13 @@ const Router = () => {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {backgroundLocation && (
+        <Routes>
+          <Route path="signin" element={<RedirectIfAuth><SignIn /></RedirectIfAuth>} />
+          <Route path="signup" element={<RedirectIfAuth><SignUp /></RedirectIfAuth>} />
+        </Routes>
+      )}
     </CartProvider>
   );
 };

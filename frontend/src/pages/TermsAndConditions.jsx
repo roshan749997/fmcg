@@ -30,10 +30,10 @@ const formatPolicyContent = (content) => {
 
 const TermsAndConditions = () => {
   const [contactInfo, setContactInfo] = useState({
-    email: 'support@kidzo.com',
+    email: 'support@fmcgmart.com',
     phone: '+91 98765 43210',
-    address: 'Kidzo Headquarters, 123 Playful Lane, Mumbai, India 400001',
-    companyName: 'Kidzo',
+    address: 'FMCG Mart Headquarters, Mumbai, India 400001',
+    companyName: 'FMCG Mart',
   });
   const [policy, setPolicy] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -213,7 +213,7 @@ const TermsAndConditions = () => {
             </h2>
             <ul className="list-disc list-inside space-y-1">
               <li>
-                We sell kids clothing, accessories, footwear, baby care products, and toys. Product images are for
+                We sell fast-moving consumer goods (FMCG) including beauty and hygiene products, beverages, cleaning and household essentials, and snacks and branded foods. Product images are for
                 reference; slight colour or texture variations may occur due to screen settings and lighting conditions.
               </li>
               <li>
@@ -309,10 +309,10 @@ const TermsAndConditions = () => {
             <p className="leading-relaxed">
               All content on the website including logos, product photos,
               designs, text, graphics and layout is the property of{" "}
-              <strong>Kidzo</strong> or its
+              <strong>{contactInfo.companyName}</strong> or its
               licensors and is protected by applicable copyright and trademark
               laws. Unauthorised use, reproduction or distribution is strictly
-              prohibited. The "Kidzo" name and logo are trademarks of Kidzo. All other trademarks, product names, and company names or logos mentioned on the site are the property of their respective owners.
+              prohibited. The <strong>{contactInfo.companyName}</strong> name and logo are trademarks of {contactInfo.companyName}. All other trademarks, product names, and company names or logos mentioned on the site are the property of their respective owners.
             </p>
           </section>
 

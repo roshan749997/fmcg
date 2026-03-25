@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
-import ScrollToTop from '../components/ScrollToTop';
 import { useHeaderColor } from '../utils/useHeaderColor';
 
 const SignIn = () => {
@@ -22,6 +21,33 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const otpInputRefs = React.useRef([]);
+  const backgroundPath = location.state?.backgroundLocation?.pathname || '/';
+  const fromPath = location.state?.from?.pathname;
+  const closePath = fromPath || backgroundPath;
+
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyWidth = document.body.style.width;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.width = prevBodyWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   // Resend OTP timer countdown
   useEffect(() => {
@@ -150,7 +176,7 @@ const SignIn = () => {
       // Trigger auth state change event
       window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { authenticated: true } }));
 
-      const redirectTo = location.state?.from?.pathname || '/';
+      const redirectTo = location.state?.from?.pathname || location.state?.backgroundLocation?.pathname || '/';
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || err.response?.message || 'Failed to sign in. Please check your credentials.');
@@ -283,7 +309,7 @@ const SignIn = () => {
       window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { authenticated: true } }));
 
       setSuccess('Login successful! Redirecting...');
-      const redirectTo = location.state?.from?.pathname || '/';
+      const redirectTo = location.state?.from?.pathname || location.state?.backgroundLocation?.pathname || '/';
       setTimeout(() => {
         navigate(redirectTo, { replace: true });
       }, 500);
@@ -336,19 +362,21 @@ const SignIn = () => {
   };
 
   return (
-    <div 
-      className="h-screen w-screen flex items-center justify-end overflow-hidden relative"
-      style={{
-        backgroundImage: 'url(https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765627597/Pink_and_Yellow_Playful_Kids_Fashion_Sale_Promotion_Landscape_Banner_1920_x_1080_px_2560_x_1440_px_1_xpoho3.svg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E7EFD9 transparent' }}>
+    <div className="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E7EFD9 transparent' }}>
 
             {/* Sign In Form */}
-            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 border border-gray-200/50 transition-all duration-300 relative mb-4 sm:mb-6">
+            <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 border border-gray-200 transition-all duration-300 relative mb-2">
+              <button
+                type="button"
+                onClick={() => navigate(closePath)}
+                className="absolute top-3 right-3 p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                aria-label="Close login popup"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
               {error && (
                 <div className="mb-3 sm:mb-4 p-3 bg-red-50 border-2 border-red-200 rounded-lg text-xs sm:text-sm text-red-700 flex items-start gap-2 animate-shake">
                   <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -456,7 +484,7 @@ const SignIn = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => navigate(location.state?.from?.pathname || '/')}
+                      onClick={() => navigate(closePath)}
                       className="w-full border-2 border-gray-300 text-gray-700 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 transform active:scale-[0.98] text-sm sm:text-base"
                     >
                       Continue as Guest
@@ -522,7 +550,7 @@ const SignIn = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => navigate(location.state?.from?.pathname || '/')}
+                      onClick={() => navigate(closePath)}
                       className="w-full border-2 border-gray-300 text-gray-700 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 transform active:scale-[0.98] text-sm sm:text-base"
                     >
                       Continue as Guest
@@ -620,7 +648,7 @@ const SignIn = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => navigate(location.state?.from?.pathname || '/')}
+                      onClick={() => navigate(closePath)}
                       className="w-full border-2 border-gray-300 text-gray-700 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 transform active:scale-[0.98] text-sm sm:text-base"
                     >
                       Continue as Guest
@@ -680,6 +708,7 @@ const SignIn = () => {
                   Don't have an account?{' '}
                   <Link
                     to="/signup"
+                    state={{ backgroundLocation: location.state?.backgroundLocation || location }}
                     className="text-[#5c9404] hover:text-[#5c9404] font-semibold transition-colors"
                   >
                     Sign up here
@@ -711,7 +740,6 @@ const SignIn = () => {
           animation: shake 0.5s;
         }
       `}</style>
-      <ScrollToTop />
     </div>
   );
 };

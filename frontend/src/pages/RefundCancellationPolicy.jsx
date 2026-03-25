@@ -30,10 +30,10 @@ const formatPolicyContent = (content) => {
 
 const RefundCancellationPolicy = () => {
   const [contactInfo, setContactInfo] = useState({
-    email: 'support@kidzo.com',
+    email: 'support@fmcgmart.com',
     phone: '+91 98765 43210',
-    address: 'Kidzo Headquarters, 123 Playful Lane, Mumbai, India 400001',
-    companyName: 'Kidzo',
+    address: 'FMCG Mart Headquarters, Mumbai, India 400001',
+    companyName: 'FMCG Mart',
   });
   const [policy, setPolicy] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -179,9 +179,9 @@ const RefundCancellationPolicy = () => {
           </p>
           <p className="mt-3 text-sm lg:text-base text-gray-700 max-w-3xl mx-auto">
             This Refund & Cancellation Policy explains how{" "}
-            <strong>Kidzo</strong> ("we",
+            <strong>{contactInfo.companyName}</strong> ("we",
             "our" or "us") handles refunds, returns, exchanges and cancellations
-            for orders placed for kids clothing, accessories, footwear, baby care products, and toys through our
+            for orders placed for beauty and hygiene products, beverages, cleaning and household essentials, and snacks and branded foods through our
             website.
           </p>
         </header>
@@ -239,7 +239,7 @@ const RefundCancellationPolicy = () => {
                 packaging or tags, intimate wear (for hygiene reasons), and items purchased during clearance sales (unless defective). Gift cards and vouchers are non-refundable.
               </li>
               <li>
-                <strong>Special Conditions:</strong> Baby care products must be unopened and in original sealed packaging. Toys must be unused and in original packaging with all accessories included.
+                <strong>Special Conditions:</strong> Consumables, beverages, and hygiene items are eligible only if unopened, sealed, and within shelf life. Cleaning liquids and fragile packs should be returned in original condition with no leakage.
               </li>
             </ul>
           </section>
@@ -434,7 +434,7 @@ const RefundCancellationPolicy = () => {
               <li>Products without original tags, packaging, labels, or accessories.</li>
               <li>Customised or personalised items (unless defective or wrong product received).</li>
               <li>Items purchased during sale/clearance (unless defective or wrong product received).</li>
-              <li>Intimate wear items (for hygiene reasons) unless defective or wrong product received.</li>
+              <li>Opened or used consumables, beverages, and hygiene products (unless defective or wrong product received).</li>
               <li>Gift cards, vouchers, and promotional items (unless defective).</li>
               <li>Items that have been washed, worn, or used (unless defective).</li>
               <li>Products returned without proper authorization or return request.</li>
@@ -503,7 +503,7 @@ const RefundCancellationPolicy = () => {
                 {contactInfo.phone}
               </span>{" "}
               <br />
-              Address: 123 Fashion Street, Mumbai, India 400001
+              Address: {contactInfo.address}
             </p>
           </section>
         </div>

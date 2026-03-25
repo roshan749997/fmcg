@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { searchProducts } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
@@ -17,6 +17,7 @@ const Navbar = () => {
   const searchWrapRefDesktop = useRef(null);
   const categoryRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartCount } = useCart();
   const [wishlistCount, setWishlistCount] = useState(0);
   const [bannerIndex, setBannerIndex] = useState(0);
@@ -248,7 +249,7 @@ const Navbar = () => {
   };
 
   const handleLogin = () => {
-    navigate('/signin');
+    navigate('/signin', { state: { backgroundLocation: location } });
   };
 
   const handleSearch = () => {

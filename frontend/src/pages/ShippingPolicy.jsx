@@ -30,10 +30,10 @@ const formatPolicyContent = (content) => {
 
 const ShippingPolicy = () => {
   const [contactInfo, setContactInfo] = useState({
-    email: 'support@kidzo.com',
+    email: 'support@fmcgmart.com',
     phone: '+91 98765 43210',
-    address: 'Kidzo Headquarters, 123 Playful Lane, Mumbai, India 400001',
-    companyName: 'Kidzo',
+    address: 'FMCG Mart Headquarters, Mumbai, India 400001',
+    companyName: 'FMCG Mart',
   });
   const [policy, setPolicy] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -179,9 +179,9 @@ const ShippingPolicy = () => {
           </p>
           <p className="mt-3 text-sm lg:text-base text-gray-700 max-w-3xl mx-auto">
             This Shipping Policy explains how{" "}
-            <strong>Kidzo</strong> ("we",
+            <strong>{contactInfo.companyName}</strong> ("we",
             "our" or "us") handles shipping and delivery of orders placed for
-            kids clothing, accessories, footwear, baby care products, and toys through our website.
+            FMCG products including beauty and hygiene, beverages, cleaning and household, and snacks and branded foods through our website.
           </p>
         </header>
 
@@ -448,7 +448,7 @@ const ShippingPolicy = () => {
               </span>{" "}
               <br />
               Address: {contactInfo.address} <br />
-              Warehouse: Unit 15, Industrial Estate, Andheri East, Mumbai, Maharashtra 400069, India <br />
+              Warehouse: FMCG Mart Fulfilment Center, Andheri East, Mumbai, Maharashtra 400069, India <br />
               Business Hours: Monday to Saturday, 10:00 AM to 7:00 PM IST
             </p>
           </section>

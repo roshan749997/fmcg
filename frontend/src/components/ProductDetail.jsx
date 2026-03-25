@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fetchSareeById, fetchSarees } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
@@ -9,7 +9,7 @@ import ScrollToTop from './ScrollToTop';
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 // Simple LoginModal Component
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, backgroundLocation }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -19,6 +19,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         <div className="flex gap-3">
           <Link
             to="/signin"
+            state={backgroundLocation ? { backgroundLocation } : undefined}
             className="flex-1 text-black font-semibold px-6 py-3 rounded-lg text-center border-2 border-black transition-all"
             style={{ backgroundColor: '#E7EFD9' }}
             onMouseEnter={(e) => e.target.style.backgroundColor = '#DEE9CD'}
@@ -100,6 +101,7 @@ const ProductCard = ({ product }) => {
 const ProductDetail = () => {
   const { id, category } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToCart } = useCart();
   const isAuthenticated = () => {
     try {
@@ -464,7 +466,7 @@ const ProductDetail = () => {
 
   return (
     <>
-      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} backgroundLocation={location} />
       
       <div className="min-h-screen bg-[#f1f3f6]">
         <div className="max-w-[1320px] mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-6 pb-20 sm:pb-6">

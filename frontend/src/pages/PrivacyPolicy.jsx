@@ -30,10 +30,10 @@ const formatPolicyContent = (content) => {
 
 const PrivacyPolicy = () => {
   const [contactInfo, setContactInfo] = useState({
-    email: 'support@kidzo.com',
+    email: 'support@fmcgmart.com',
     phone: '+91 98765 43210',
-    address: 'Kidzo Headquarters, 123 Playful Lane, Mumbai, India 400001',
-    companyName: 'Kidzo',
+    address: 'FMCG Mart Headquarters, Mumbai, India 400001',
+    companyName: 'FMCG Mart',
   });
   const [policy, setPolicy] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -181,7 +181,7 @@ const PrivacyPolicy = () => {
             This Privacy Policy explains how{" "}
             <strong>{contactInfo.companyName}</strong> ("we",
             "our" or "us") collects, uses, shares and protects your information
-            when you browse or shop for kids clothing, accessories, footwear, baby care products, and toys
+            when you browse or shop for FMCG products including beauty and hygiene, beverages, cleaning and household, and snacks and branded foods
             through our website (the "Service").
           </p>
         </header>
@@ -238,7 +238,7 @@ const PrivacyPolicy = () => {
               </li>
               <li>
                 <strong>Order & Transaction Information:</strong> Products
-                purchased (kids clothing, accessories, footwear, baby care products, toys), order history, payment
+                purchased (beauty and hygiene, beverages, cleaning and household essentials, snacks and branded foods), order history, payment
                 method used and transaction identifiers. Card details are
                 processed securely by our payment gateway; we do not store your
                 full card information.
@@ -323,7 +323,7 @@ const PrivacyPolicy = () => {
             </p>
             <ul className="list-disc list-inside space-y-1">
               <li>Remember your cart items and login sessions.</li>
-              <li>Show recently viewed sarees and accessory suggestions.</li>
+              <li>Show recently viewed products and relevant product suggestions.</li>
               <li>Measure website performance and fix issues.</li>
             </ul>
             <p className="mt-2">

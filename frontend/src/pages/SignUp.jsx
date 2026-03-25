@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
-import ScrollToTop from '../components/ScrollToTop';
 import { useHeaderColor } from '../utils/useHeaderColor';
 
 const SignUp = () => {
@@ -28,6 +27,33 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const backgroundLocation = location.state?.backgroundLocation;
+  const closePath = backgroundLocation?.pathname || '/';
+
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyWidth = document.body.style.width;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.width = prevBodyWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +69,7 @@ const SignUp = () => {
       const resp = await api.signup({ name, email: formData.email, password: formData.password });
       setSuccess('Account created successfully');
       // Do NOT auto-login after signup; redirect to Sign In
-      navigate('/signin', { replace: true });
+      navigate('/signin', { replace: true, state: { backgroundLocation: backgroundLocation || location } });
     } catch (err) {
       setError(err.message || 'Failed to sign up');
     } finally {
@@ -52,19 +78,21 @@ const SignUp = () => {
   };
 
   return (
-    <div 
-      className="h-screen w-screen flex items-center justify-end overflow-hidden relative"
-      style={{
-        backgroundImage: 'url(https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765627597/Pink_and_Yellow_Playful_Kids_Fashion_Sale_Promotion_Landscape_Banner_1920_x_1080_px_2560_x_1440_px_1_xpoho3.svg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E7EFD9 transparent' }}>
+    <div className="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E7EFD9 transparent' }}>
 
             {/* Sign Up Form */}
-            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-4 sm:p-6 border border-gray-200/50 transition-all duration-300 relative">
+            <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 border border-gray-200 transition-all duration-300 relative">
+              <button
+                type="button"
+                onClick={() => navigate(closePath)}
+                className="absolute top-3 right-3 p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                aria-label="Close sign up popup"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
               {error && (
                 <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-lg text-xs sm:text-sm text-red-600 flex items-center gap-2 animate-shake">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -297,6 +325,7 @@ const SignUp = () => {
                   Already have an account?{' '}
                   <Link
                     to="/signin"
+                    state={{ backgroundLocation: backgroundLocation || location }}
                     className="text-[#5c9404] hover:text-[#5c9404] font-semibold transition-colors"
                   >
                     Sign in here
@@ -320,7 +349,6 @@ const SignUp = () => {
           background: #DEE9CD;
         }
       `}</style>
-      <ScrollToTop />
     </div>
   );
 };

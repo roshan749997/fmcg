@@ -71,11 +71,10 @@ const Footer = () => {
   ];
 
   const categories = [
-    { name: 'Kids Clothing', path: '/category/kids-clothing' },
-    { name: 'Winter Wear', path: '/category/kids-clothing/winterwear' },
-    { name: 'Footwear', path: '/category/footwear' },
-    { name: 'Baby Care', path: '/category/baby-care' },
-    { name: 'Toys', path: '/category/toys' },
+    { name: 'Beauty & Hygiene', path: '/category/beauty-and-hygiene' },
+    { name: 'Beverages', path: '/category/beverages' },
+    { name: 'Cleaning & Household', path: '/category/cleaning-and-household' },
+    { name: 'Snacks & Branded Foods', path: '/category/snacks-and-branded-foods' },
   ];
 
   const trustFeatures = [
