@@ -182,3 +182,14 @@ main {
 .from-rose-700 { --tw-gradient-from: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
 .via-rose-700 { --tw-gradient-via: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
 .to-rose-700 { --tw-gradient-to: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
+
+/* Utility: hide scrollbars (keep scrolling enabled) */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge legacy */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome/Safari */
+}

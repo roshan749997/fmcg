@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTruck, FaAward, FaShieldAlt, FaUndo } from 'react-icons/fa';
 
@@ -16,42 +16,110 @@ const KidzoSections = () => {
   const MainCategories = () => {
     const categories = [
       { 
-        name: 'Cloths', 
+        name: 'Makeup', 
         icon: '🚴‍♂️', 
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538765/unnamed_yt1lzi.jpg', 
-        path: '/category/kids-clothing' 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432684/6ac06970-96fc-482a-94e7-babf1d959fdc.png', 
+        path: '/category/beauty-and-hygiene/makeup' 
       },
       { 
-        name: 'Winterwear', 
-        icon: '🚙', 
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538871/unnamed_t9cus4.jpg', 
-        path: '/category/kids-clothing/winterwear' 
-      },
-      { 
-        name: 'Kids Accessories', 
+        name: 'Energy & Soft Drinks', 
         icon: '🚛', 
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538873/unnamed_cus3wx.jpg', 
-        path: '/category/kids-accessories' 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432694/c19b217b-7f16-4b62-9029-cd527b7c1b17.png', 
+        path: '/category/beverages/energy-and-soft-drinks' 
       },
       { 
-        name: 'Footwear', 
+        name: 'Bath & Hand Wash', 
+        icon: '🚙', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774423858/8140e669-2bc1-4c63-9f43-ce249342ebc2.png', 
+        path: '/category/beauty-and-hygiene/bath-and-hand-wash' 
+      },
+      { 
+        name: 'Tea', 
         icon: '🚜', 
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538961/unnamed_hqycjk.jpg', 
-        path: '/category/footwear' 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774425891/7486c102-b821-4cde-8c58-8f127b79b767.png', 
+        path: '/category/beverages/tea' 
       },
       { 
-        name: 'Baby Care', 
+        name: "Men's Grooming", 
         icon: '🏎️', 
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538964/unnamed_fn6esy.jpg', 
-        path: '/category/baby-care' 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774425536/a3179ec5-4267-4e39-a412-6e6ceb0ce516.png', 
+        path: '/category/beauty-and-hygiene/mens-grooming' 
       },
       { 
-        name: 'Toys', 
+        name: 'Hair Care', 
         icon: '🔥', 
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765539006/unnamed_vlrbtq.jpg', 
-        path: '/category/toys' 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774425967/3ddf5209-ba06-40f3-8d09-5d6fb3ea362e.png', 
+        path: '/category/beauty-and-hygiene/hair-care' 
+      },
+      { 
+        name: 'Fragrances & Deos', 
+        icon: '💫', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774426135/4501126f-941c-4c6f-9bb8-8adc890de203.png', 
+        path: '/category/beauty-and-hygiene/fragrances-and-deos' 
+      },
+      {
+        name: 'Sports & Fitness',
+        icon: '🏃‍♂️',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432057/e41e6d8b-f963-4abd-b9f7-c619c9ebe8f0.png',
+        path: '/category/cleaning-and-household/sports-and-fitness'
+      },
+      {
+        name: 'Toys & Games',
+        icon: '🧸',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432198/cd1f92b8-dd04-41e6-92ba-2dd38fbcbb16.png',
+        path: '/category/cleaning-and-household/toys-and-games'
+      },
+      {
+        name: 'Bins & Bathroom Ware',
+        icon: '🧺',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432238/f8a94dec-5e6d-48a5-a6af-e75add435ee5.png',
+        path: '/category/cleaning-and-household/bins-and-bathroom-ware'
       }
     ];
+
+    const carouselRef = useRef(null);
+    const [isPaused, setIsPaused] = useState(false);
+
+    const scrollPrev = () => {
+      const el = carouselRef.current;
+      if (!el) return;
+      const maxScrollLeft = el.scrollWidth - el.clientWidth;
+      const step = el.clientWidth;
+      const target = el.scrollLeft - step;
+      if (target <= 0) {
+        el.scrollLeft = Math.max(0, maxScrollLeft);
+      } else {
+        el.scrollBy({ left: -step, behavior: 'smooth' });
+      }
+    };
+
+    const scrollNext = () => {
+      const el = carouselRef.current;
+      if (!el) return;
+      const maxScrollLeft = el.scrollWidth - el.clientWidth;
+      const step = el.clientWidth;
+      const target = el.scrollLeft + step;
+      if (target >= maxScrollLeft - 1) {
+        el.scrollLeft = 0;
+      } else {
+        el.scrollBy({ left: step, behavior: 'smooth' });
+      }
+    };
+
+    useEffect(() => {
+      const id = window.setInterval(() => {
+        if (isPaused) return;
+        const el = carouselRef.current;
+        if (!el) return;
+        const maxScrollLeft = el.scrollWidth - el.clientWidth;
+        const step = el.clientWidth;
+        const target = el.scrollLeft + step;
+        if (target >= maxScrollLeft - 1) el.scrollLeft = 0;
+        else el.scrollBy({ left: step, behavior: 'smooth' });
+      }, 3000);
+
+      return () => window.clearInterval(id);
+    }, [isPaused]);
 
     return (
       <section 
@@ -59,9 +127,9 @@ const KidzoSections = () => {
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
-          <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
+          <div className="text-center mb-4 sm:mb-6 md:mb-8 px-2 sm:px-4">
             <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase" 
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-1 sm:mb-2 uppercase" 
               style={{ 
                 fontFamily: "'Bebas Neue', sans-serif", 
                 letterSpacing: '2px', 
@@ -72,32 +140,70 @@ const KidzoSections = () => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5 px-2 sm:px-4">
-            {categories.map((category, index) => (
-              <div
-                key={index}
-                className="group cursor-pointer"
-                onClick={() => handleCategoryClick(category.path)}
-              >
-                <div className="relative aspect-square bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:scale-105">
-                  <div className="absolute inset-0 bg-gray-100">
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/200x200/1F2937/FFFFFF?text=Car';
-                      }}
-                    />
+          <div className="relative px-2 sm:px-4">
+            <button
+              type="button"
+              aria-label="Previous categories"
+              onClick={() => {
+                setIsPaused(true);
+                scrollPrev();
+                window.setTimeout(() => setIsPaused(false), 1200);
+              }}
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              aria-label="Next categories"
+              onClick={() => {
+                setIsPaused(true);
+                scrollNext();
+                window.setTimeout(() => setIsPaused(false), 1200);
+              }}
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <div
+              ref={carouselRef}
+              className="flex gap-2 sm:gap-3 md:gap-4 lg:gap-5 overflow-x-auto scroll-smooth py-1 hide-scrollbar"
+              style={{ scrollSnapType: 'x mandatory' }}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              {categories.map((category, index) => (
+                <div
+                  key={index}
+                  className="group cursor-pointer snap-start w-[140px] sm:w-[170px] md:w-[190px] lg:w-[210px] flex-shrink-0"
+                  onClick={() => handleCategoryClick(category.path)}
+                >
+                  <div className="relative aspect-square bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:scale-105">
+                    <div className="absolute inset-0 bg-gray-100">
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/200x200/1F2937/FFFFFF?text=Car';
+                        }}
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <h3 className="text-center mt-3 text-xs sm:text-sm md:text-base font-semibold text-gray-900 group-hover:text-[#02050B] transition-colors duration-300">
+                    {category.name}
+                  </h3>
                 </div>
-                <h3 className="text-center mt-3 text-xs sm:text-sm md:text-base font-semibold text-gray-900 group-hover:text-[#02050B] transition-colors duration-300">
-                  {category.name}
-                </h3>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -135,9 +241,9 @@ const KidzoSections = () => {
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
-          <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
+          <div className="text-center mb-4 sm:mb-6 md:mb-8 px-2 sm:px-4">
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-1 sm:mb-2 uppercase"
               style={{
                 fontFamily: "'Bebas Neue', sans-serif",
                 letterSpacing: '2px',
