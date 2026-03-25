@@ -109,54 +109,22 @@ const KidzoSections = () => {
     const offers = [
       {
         id: 1,
-        badge: 'Limited Time',
-        title: '20%',
-        subtitle: 'OFF',
-        description: 'Limited Stock',
-        text: 'Grab your favorite products before they run out!',
-        buttonText: 'Shop Now →',
-        gradient: 'from-pink-500 via-pink-600 to-pink-700',
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538964/unnamed_fn6esy.jpg',
-        buttonClass: 'bg-white text-[#02050B] hover:bg-[#02050B] hover:text-white',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421048/58017a7a-e5b0-451f-a5e3-4cfeaf120849.png',
         path: '/category/baby-care'
       },
       {
         id: 2,
-        badge: 'New Arrival',
-        title: 'NEW',
-        subtitle: 'Collection',
-        description: 'Latest Products',
-        text: 'Explore our newest arrivals!',
-        buttonText: 'Explore →',
-        gradient: 'from-blue-500 via-purple-600 to-blue-700',
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538871/unnamed_t9cus4.jpg',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421025/94c73c6e-e976-429e-962a-995e249ce108.png',
         path: '/category/kids-clothing/winterwear'
       },
       {
         id: 3,
-        badge: 'Special Offer',
-        title: 'FREE',
-        subtitle: 'Shipping',
-        description: 'On Orders Above ₹999',
-        text: 'Shop more and save on delivery charges!',
-        buttonText: 'Shop Now →',
-        gradient: 'from-teal-500 via-green-500 to-teal-600',
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538961/unnamed_hqycjk.jpg',
-        buttonClass: 'bg-white text-[#02050B] hover:bg-[#02050B] hover:text-white',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421010/cad31fe6-8aac-41dd-974d-2fa7f3e615d2.png',
         path: '/category/footwear'
       },
       {
         id: 4,
-        badge: 'Hot Deals',
-        title: '30%',
-        subtitle: 'OFF',
-        description: 'Premium Collection',
-        text: 'Best deals on premium products!',
-        buttonText: 'Shop Now →',
-        gradient: 'from-blue-400 via-blue-500 to-blue-600',
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538765/unnamed_yt1lzi.jpg',
-        buttonClass: 'bg-white text-blue-700 hover:bg-blue-50',
-        badgeClass: 'bg-blue-300/30',
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421061/b0e54120-4ec8-4143-b177-25b91ee3d5a7.png',
         path: '/category/kids-clothing'
       }
     ];
@@ -168,25 +136,17 @@ const KidzoSections = () => {
       >
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
-            <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase" 
-              style={{ 
-                fontFamily: "'Bebas Neue', sans-serif", 
-                letterSpacing: '2px', 
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)' 
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                letterSpacing: '2px',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             >
               OFFER ZONE
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base mt-2">Limited time offers - Don't miss out!</p>
-            <button
-              onClick={() => handleCategoryClick('/category/kids-clothing')}
-              className="mt-4 px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              View All Offers →
-            </button>
           </div>
-
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 px-2 sm:px-4">
             {offers.map((offer) => (
               <div
@@ -194,31 +154,16 @@ const KidzoSections = () => {
                 onClick={() => handleCategoryClick(offer.path)}
                 className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] group cursor-pointer"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${offer.gradient}`}></div>
-                <div className="absolute inset-0">
-                  <img
-                    src={offer.image}
-                    alt={offer.badge}
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/600/1F2937/FFFFFF?text=Offer';
-                    }}
-                  />
-                </div>
-                <div className="relative p-4 sm:p-5 md:p-6 text-white z-10">
-                  <div className={`inline-block ${offer.badgeClass || 'bg-white/20'} px-3 py-1 rounded-full mb-2`}>
-                    <span className="text-xs font-bold uppercase tracking-wider">{offer.badge}</span>
-                    </div>
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-black mb-1 leading-none">{offer.title}</div>
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">{offer.subtitle}</div>
-                  <div className="text-sm sm:text-base mb-2 font-semibold opacity-95">{offer.description}</div>
-                  <p className="text-xs sm:text-sm opacity-90 mb-2">{offer.text}</p>
-                  <button className={`mt-2 ${offer.buttonClass} px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 transform group-hover:scale-105`}>
-                    {offer.buttonText}
-                      </button>
-                    </div>
                 <div className="absolute top-4 right-4 w-20 h-20 bg-white/10 rounded-full"></div>
+                <img
+                  src={offer.image}
+                  alt=""
+                  className="w-full h-full object-cover transition-transform duration-300 transform group-hover:scale-[1.03]"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/600/1F2937/FFFFFF?text=Offer';
+                  }}
+                />
               </div>
             ))}
           </div>
