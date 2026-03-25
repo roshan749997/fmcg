@@ -149,7 +149,7 @@ export default function AddressForm() {
         description: 'Order Payment',
         order_id: order.id,
         prefill: { name: formData.name || '', contact: formData.mobile || '' },
-        theme: { color: '#FF1493' },
+        theme: { color: '#5c9404' },
         handler: async function (response) {
           try {
             console.log('[Razorpay] Payment response received:', response);

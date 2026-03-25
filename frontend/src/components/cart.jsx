@@ -58,7 +58,7 @@ function Cart() {
         </button>
 
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8 flex items-center gap-2 sm:gap-3">
-          <span className="w-0.5 sm:w-1 h-6 sm:h-8 md:h-10 bg-gradient-to-b from-[#FF1493] to-[#8B2BE2] rounded-full"></span>
+          <span className="w-0.5 sm:w-1 h-6 sm:h-8 md:h-10 bg-gradient-to-b from-[#5c9404] to-[#8B2BE2] rounded-full"></span>
           <span className="break-words">Your Shopping Cart ({cartCount} {cartCount === 1 ? 'item' : 'items'})</span>
         </h1>
       
@@ -128,13 +128,13 @@ function Cart() {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
                     <div className="flex-1 min-w-0">
                       <h3 
-                        className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer hover:text-[#FF1493] transition-colors mb-1 line-clamp-2"
+                        className="text-sm sm:text-base font-semibold text-gray-900 cursor-pointer hover:text-[#5c9404] transition-colors mb-1 line-clamp-2"
                         onClick={() => navigate(`/product/${item.id}`)}
                       >
                         {item.name}
                       </h3>
                       {item.size && (
-                        <p className="text-[#FF1493] font-semibold text-xs mb-1">Size: {item.size}</p>
+                        <p className="text-[#5c9404] font-semibold text-xs mb-1">Size: {item.size}</p>
                       )}
                       {(item.material || item.work) && (
                         <p className="text-gray-600 text-xs mb-1.5 line-clamp-1">
@@ -150,7 +150,7 @@ function Cart() {
                         <div className="flex items-center border border-pink-300 rounded-md overflow-hidden">
                           <button 
                             onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1, item.size)}
-                            className="px-2.5 sm:px-3 py-1.5 bg-pink-50 text-[#FF1493] hover:bg-pink-100 font-bold cursor-pointer transition-colors touch-manipulation"
+                            className="px-2.5 sm:px-3 py-1.5 bg-pink-50 text-[#5c9404] hover:bg-pink-100 font-bold cursor-pointer transition-colors touch-manipulation"
                             aria-label="Decrease quantity"
                           >
                             <FaMinus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -158,7 +158,7 @@ function Cart() {
                           <span className="px-3 sm:px-4 py-1.5 border-x border-pink-300 bg-white text-gray-900 font-semibold text-sm min-w-[2.25rem] text-center">{item.quantity || 1}</span>
                           <button 
                             onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1, item.size)}
-                            className="px-2.5 sm:px-3 py-1.5 bg-pink-50 text-[#FF1493] hover:bg-pink-100 font-bold cursor-pointer transition-colors touch-manipulation"
+                            className="px-2.5 sm:px-3 py-1.5 bg-pink-50 text-[#5c9404] hover:bg-pink-100 font-bold cursor-pointer transition-colors touch-manipulation"
                             aria-label="Increase quantity"
                           >
                             <FaPlus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -177,7 +177,7 @@ function Cart() {
                     
                     <div className="text-left sm:text-right w-full sm:w-auto flex sm:block items-center sm:items-end justify-between sm:justify-end gap-2">
                       <div>
-                        <p className="text-base sm:text-lg font-bold text-[#FF1493]">₹{(item.price * (item.quantity || 1)).toLocaleString()}</p>
+                        <p className="text-base sm:text-lg font-bold text-[#5c9404]">₹{(item.price * (item.quantity || 1)).toLocaleString()}</p>
                         <p className="text-[11px] text-gray-500">Line total</p>
                         {item.originalPrice > item.price && (
                           <p className="text-[11px] text-gray-500 line-through mt-0.5">₹{item.originalPrice.toLocaleString()}</p>
@@ -195,7 +195,7 @@ function Cart() {
           <div className="lg:sticky lg:top-4 h-fit">
             <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl p-4 sm:p-5 md:p-6 border-2 border-pink-200 bg-gradient-to-br from-white to-pink-50/30">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
-                <span className="w-0.5 sm:w-1 h-5 sm:h-6 bg-gradient-to-b from-[#FF1493] to-[#8B2BE2] rounded-full"></span>
+                <span className="w-0.5 sm:w-1 h-5 sm:h-6 bg-gradient-to-b from-[#5c9404] to-[#8B2BE2] rounded-full"></span>
                 Order Summary
               </h2>
               <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
@@ -205,7 +205,7 @@ function Cart() {
                 </div>
                 <div className="flex justify-between items-center py-1.5 sm:py-2 border-b border-pink-100">
                   <span className="text-gray-700 font-medium text-sm sm:text-base">Shipping</span>
-                  <span className={`text-sm sm:text-base ${cartTotal >= 1000 ? "text-[#FF1493] font-bold" : "text-gray-700 font-semibold"}`}>
+                  <span className={`text-sm sm:text-base ${cartTotal >= 1000 ? "text-[#5c9404] font-bold" : "text-gray-700 font-semibold"}`}>
                     {cartTotal >= 1000 ? 'Free ✓' : '₹99'}
                   </span>
                 </div>
@@ -216,7 +216,7 @@ function Cart() {
                 <div className="border-t-2 border-pink-300 my-2 sm:my-3"></div>
                 <div className="flex justify-between items-center text-lg sm:text-xl font-bold bg-gradient-to-r from-pink-50 to-purple-50 p-3 sm:p-4 rounded-lg border border-pink-200">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-[#FF1493]">₹{(cartTotal + (cartTotal >= 1000 ? 0 : 99) + Math.round(cartTotal * 0.05)).toLocaleString()}</span>
+                  <span className="text-[#5c9404]">₹{(cartTotal + (cartTotal >= 1000 ? 0 : 99) + Math.round(cartTotal * 0.05)).toLocaleString()}</span>
                 </div>
               </div>
               

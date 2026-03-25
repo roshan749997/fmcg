@@ -29,3 +29,156 @@ main {
 .flex {
   min-height: 0;
 }
+
+/* Theme override: replace Tailwind pink/rose palette with screenshot accent.
+   This keeps existing classNames working without editing every component. */
+:root {
+  --theme-accent-green: #5c9404;
+  --theme-accent-green-dark: #4f7c03;
+  --theme-accent-green-darker: #3a5d00;
+  --theme-accent-green-50: #e7efd9;
+  --theme-accent-green-100: #dee9cd;
+  --theme-accent-green-200: #c9eaa0;
+  --theme-accent-green-300: #b1dc7b;
+  --theme-accent-green-400: #93c853;
+
+  --theme-accent-green-rgb: 92 148 4;
+  --theme-accent-green-dark-rgb: 79 124 3;
+  --theme-accent-green-darker-rgb: 58 93 0;
+  --theme-accent-green-50-rgb: 231 239 217;
+  --theme-accent-green-100-rgb: 222 233 205;
+  --theme-accent-green-200-rgb: 201 234 160;
+  --theme-accent-green-300-rgb: 177 220 123;
+  --theme-accent-green-400-rgb: 147 200 83;
+}
+
+/* Pink -> Green */
+.text-pink-50 { color: var(--theme-accent-green-50) !important; }
+.text-pink-100 { color: var(--theme-accent-green-100) !important; }
+.text-pink-200 { color: var(--theme-accent-green-200) !important; }
+.text-pink-300 { color: var(--theme-accent-green-300) !important; }
+.text-pink-400 { color: var(--theme-accent-green-400) !important; }
+.text-pink-500 { color: var(--theme-accent-green) !important; }
+.text-pink-600 { color: var(--theme-accent-green-dark) !important; }
+.text-pink-700 { color: var(--theme-accent-green-darker) !important; }
+
+.bg-pink-50 { background-color: var(--theme-accent-green-50) !important; }
+.bg-pink-100 { background-color: var(--theme-accent-green-100) !important; }
+.bg-pink-200 { background-color: var(--theme-accent-green-200) !important; }
+.bg-pink-300 { background-color: var(--theme-accent-green-300) !important; }
+.bg-pink-400 { background-color: var(--theme-accent-green-400) !important; }
+.bg-pink-500 { background-color: var(--theme-accent-green) !important; }
+.bg-pink-600 { background-color: var(--theme-accent-green-dark) !important; }
+.bg-pink-700 { background-color: var(--theme-accent-green-darker) !important; }
+
+.border-pink-50 { border-color: var(--theme-accent-green-50) !important; }
+.border-pink-100 { border-color: var(--theme-accent-green-100) !important; }
+.border-pink-200 { border-color: var(--theme-accent-green-200) !important; }
+.border-pink-300 { border-color: var(--theme-accent-green-300) !important; }
+.border-pink-400 { border-color: var(--theme-accent-green-400) !important; }
+.border-pink-500 { border-color: var(--theme-accent-green) !important; }
+.border-pink-600 { border-color: var(--theme-accent-green-dark) !important; }
+.border-pink-700 { border-color: var(--theme-accent-green-darker) !important; }
+
+/* Focus rings/borders that use pink in components */
+.focus\:ring-pink-300:focus { --tw-ring-color: var(--theme-accent-green-300) !important; }
+.focus\:ring-pink-400:focus { --tw-ring-color: var(--theme-accent-green-400) !important; }
+.focus\:ring-pink-500:focus { --tw-ring-color: var(--theme-accent-green) !important; }
+.focus\:ring-pink-600:focus { --tw-ring-color: var(--theme-accent-green-dark) !important; }
+.focus\:border-pink-400:focus { border-color: var(--theme-accent-green-400) !important; }
+.focus\:border-pink-500:focus { border-color: var(--theme-accent-green) !important; }
+
+/* Rose -> Green (commonly used in gradients) */
+.text-rose-50 { color: var(--theme-accent-green-50) !important; }
+.text-rose-100 { color: var(--theme-accent-green-100) !important; }
+.text-rose-200 { color: var(--theme-accent-green-200) !important; }
+.text-rose-300 { color: var(--theme-accent-green-300) !important; }
+.text-rose-400 { color: var(--theme-accent-green-400) !important; }
+.text-rose-500 { color: var(--theme-accent-green) !important; }
+.text-rose-600 { color: var(--theme-accent-green-dark) !important; }
+.text-rose-700 { color: var(--theme-accent-green-darker) !important; }
+
+.bg-rose-50 { background-color: var(--theme-accent-green-50) !important; }
+.bg-rose-100 { background-color: var(--theme-accent-green-100) !important; }
+.bg-rose-200 { background-color: var(--theme-accent-green-200) !important; }
+.bg-rose-300 { background-color: var(--theme-accent-green-300) !important; }
+.bg-rose-400 { background-color: var(--theme-accent-green-400) !important; }
+.bg-rose-500 { background-color: var(--theme-accent-green) !important; }
+.bg-rose-600 { background-color: var(--theme-accent-green-dark) !important; }
+.bg-rose-700 { background-color: var(--theme-accent-green-darker) !important; }
+
+.border-rose-50 { border-color: var(--theme-accent-green-50) !important; }
+.border-rose-100 { border-color: var(--theme-accent-green-100) !important; }
+.border-rose-200 { border-color: var(--theme-accent-green-200) !important; }
+.border-rose-300 { border-color: var(--theme-accent-green-300) !important; }
+.border-rose-400 { border-color: var(--theme-accent-green-400) !important; }
+.border-rose-500 { border-color: var(--theme-accent-green) !important; }
+.border-rose-600 { border-color: var(--theme-accent-green-dark) !important; }
+.border-rose-700 { border-color: var(--theme-accent-green-darker) !important; }
+
+/* Gradient stops: keep bg-gradient-to-* from/via/to colors in sync */
+/* Pink */
+.from-pink-50 { --tw-gradient-from: rgb(var(--theme-accent-green-50-rgb) / 1) !important; }
+.via-pink-50 { --tw-gradient-via: rgb(var(--theme-accent-green-50-rgb) / 1) !important; }
+.to-pink-50 { --tw-gradient-to: rgb(var(--theme-accent-green-50-rgb) / 1) !important; }
+
+.from-pink-100 { --tw-gradient-from: rgb(var(--theme-accent-green-100-rgb) / 1) !important; }
+.via-pink-100 { --tw-gradient-via: rgb(var(--theme-accent-green-100-rgb) / 1) !important; }
+.to-pink-100 { --tw-gradient-to: rgb(var(--theme-accent-green-100-rgb) / 1) !important; }
+
+.from-pink-200 { --tw-gradient-from: rgb(var(--theme-accent-green-200-rgb) / 1) !important; }
+.via-pink-200 { --tw-gradient-via: rgb(var(--theme-accent-green-200-rgb) / 1) !important; }
+.to-pink-200 { --tw-gradient-to: rgb(var(--theme-accent-green-200-rgb) / 1) !important; }
+
+.from-pink-300 { --tw-gradient-from: rgb(var(--theme-accent-green-300-rgb) / 1) !important; }
+.via-pink-300 { --tw-gradient-via: rgb(var(--theme-accent-green-300-rgb) / 1) !important; }
+.to-pink-300 { --tw-gradient-to: rgb(var(--theme-accent-green-300-rgb) / 1) !important; }
+
+.from-pink-400 { --tw-gradient-from: rgb(var(--theme-accent-green-400-rgb) / 1) !important; }
+.via-pink-400 { --tw-gradient-via: rgb(var(--theme-accent-green-400-rgb) / 1) !important; }
+.to-pink-400 { --tw-gradient-to: rgb(var(--theme-accent-green-400-rgb) / 1) !important; }
+
+.from-pink-500 { --tw-gradient-from: rgb(var(--theme-accent-green-rgb) / 1) !important; }
+.via-pink-500 { --tw-gradient-via: rgb(var(--theme-accent-green-rgb) / 1) !important; }
+.to-pink-500 { --tw-gradient-to: rgb(var(--theme-accent-green-rgb) / 1) !important; }
+
+.from-pink-600 { --tw-gradient-from: rgb(var(--theme-accent-green-dark-rgb) / 1) !important; }
+.via-pink-600 { --tw-gradient-via: rgb(var(--theme-accent-green-dark-rgb) / 1) !important; }
+.to-pink-600 { --tw-gradient-to: rgb(var(--theme-accent-green-dark-rgb) / 1) !important; }
+
+.from-pink-700 { --tw-gradient-from: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
+.via-pink-700 { --tw-gradient-via: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
+.to-pink-700 { --tw-gradient-to: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
+
+/* Rose */
+.from-rose-50 { --tw-gradient-from: rgb(var(--theme-accent-green-50-rgb) / 1) !important; }
+.via-rose-50 { --tw-gradient-via: rgb(var(--theme-accent-green-50-rgb) / 1) !important; }
+.to-rose-50 { --tw-gradient-to: rgb(var(--theme-accent-green-50-rgb) / 1) !important; }
+
+.from-rose-100 { --tw-gradient-from: rgb(var(--theme-accent-green-100-rgb) / 1) !important; }
+.via-rose-100 { --tw-gradient-via: rgb(var(--theme-accent-green-100-rgb) / 1) !important; }
+.to-rose-100 { --tw-gradient-to: rgb(var(--theme-accent-green-100-rgb) / 1) !important; }
+
+.from-rose-200 { --tw-gradient-from: rgb(var(--theme-accent-green-200-rgb) / 1) !important; }
+.via-rose-200 { --tw-gradient-via: rgb(var(--theme-accent-green-200-rgb) / 1) !important; }
+.to-rose-200 { --tw-gradient-to: rgb(var(--theme-accent-green-200-rgb) / 1) !important; }
+
+.from-rose-300 { --tw-gradient-from: rgb(var(--theme-accent-green-300-rgb) / 1) !important; }
+.via-rose-300 { --tw-gradient-via: rgb(var(--theme-accent-green-300-rgb) / 1) !important; }
+.to-rose-300 { --tw-gradient-to: rgb(var(--theme-accent-green-300-rgb) / 1) !important; }
+
+.from-rose-400 { --tw-gradient-from: rgb(var(--theme-accent-green-400-rgb) / 1) !important; }
+.via-rose-400 { --tw-gradient-via: rgb(var(--theme-accent-green-400-rgb) / 1) !important; }
+.to-rose-400 { --tw-gradient-to: rgb(var(--theme-accent-green-400-rgb) / 1) !important; }
+
+.from-rose-500 { --tw-gradient-from: rgb(var(--theme-accent-green-rgb) / 1) !important; }
+.via-rose-500 { --tw-gradient-via: rgb(var(--theme-accent-green-rgb) / 1) !important; }
+.to-rose-500 { --tw-gradient-to: rgb(var(--theme-accent-green-rgb) / 1) !important; }
+
+.from-rose-600 { --tw-gradient-from: rgb(var(--theme-accent-green-dark-rgb) / 1) !important; }
+.via-rose-600 { --tw-gradient-via: rgb(var(--theme-accent-green-dark-rgb) / 1) !important; }
+.to-rose-600 { --tw-gradient-to: rgb(var(--theme-accent-green-dark-rgb) / 1) !important; }
+
+.from-rose-700 { --tw-gradient-from: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
+.via-rose-700 { --tw-gradient-via: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }
+.to-rose-700 { --tw-gradient-to: rgb(var(--theme-accent-green-darker-rgb) / 1) !important; }

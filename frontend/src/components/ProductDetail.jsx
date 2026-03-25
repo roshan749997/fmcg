@@ -20,9 +20,9 @@ const LoginModal = ({ isOpen, onClose }) => {
           <Link
             to="/signin"
             className="flex-1 text-black font-semibold px-6 py-3 rounded-lg text-center border-2 border-black transition-all"
-            style={{ backgroundColor: '#FFD1DC' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#FFB6C1'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#FFD1DC'}
+            style={{ backgroundColor: '#E7EFD9' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#DEE9CD'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#E7EFD9'}
           >
             Login
           </Link>
@@ -66,17 +66,17 @@ const ProductCard = ({ product }) => {
           loading="lazy"
         />
         {discountPercent > 0 && (
-          <span className="absolute top-2 right-2 bg-gradient-to-r from-[#8B2BE2] to-[#FF1493] text-white text-xs font-bold px-2 py-1 rounded-md shadow-md uppercase">
+          <span className="absolute top-2 right-2 bg-gradient-to-r from-[#8B2BE2] to-[#5c9404] text-white text-xs font-bold px-2 py-1 rounded-md shadow-md uppercase">
             {discountPercent}% OFF
           </span>
         )}
       </div>
       <div className="relative p-4 bg-white">
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B2BE2] via-[#FF1493] to-[#8B2BE2] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-        <h3 className="text-xs font-semibold text-[#FF1493] uppercase tracking-wide line-clamp-1 mb-1">
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B2BE2] via-[#5c9404] to-[#8B2BE2] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        <h3 className="text-xs font-semibold text-[#5c9404] uppercase tracking-wide line-clamp-1 mb-1">
           {product.product_info?.manufacturer || product.brand || 'KIDZO'}
         </h3>
-        <p className="text-sm font-bold text-black line-clamp-2 mb-2 min-h-[2.5rem] group-hover:text-[#FF1493] transition-colors">
+        <p className="text-sm font-bold text-black line-clamp-2 mb-2 min-h-[2.5rem] group-hover:text-[#5c9404] transition-colors">
           {product.name || product.title || 'Untitled Product'}
         </p>
         <div className="flex items-baseline gap-2">
@@ -895,9 +895,9 @@ const NotFoundState = () => (
     <Link 
       to="/" 
       className="text-black px-8 py-3 rounded-lg font-medium border-2 border-black transition-all"
-      style={{ backgroundColor: '#FFD1DC' }}
-      onMouseEnter={(e) => e.target.style.backgroundColor = '#FFB6C1'}
-      onMouseLeave={(e) => e.target.style.backgroundColor = '#FFD1DC'}
+      style={{ backgroundColor: '#E7EFD9' }}
+      onMouseEnter={(e) => e.target.style.backgroundColor = '#DEE9CD'}
+      onMouseLeave={(e) => e.target.style.backgroundColor = '#E7EFD9'}
     >
       Back to Home
     </Link>

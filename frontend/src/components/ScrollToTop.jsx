@@ -50,16 +50,16 @@ const ScrollToTop = () => {
           className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 bg-pink-500 hover:bg-pink-600 text-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
           aria-label="Scroll to top"
           style={{
-            backgroundColor: '#FF1493',
-            boxShadow: '0 4px 12px rgba(255, 20, 147, 0.4)'
+            backgroundColor: '#5c9404',
+            boxShadow: '0 4px 12px rgba(92, 148, 4, 0.4)'
           }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#FF69B4';
-            e.target.style.boxShadow = '0 6px 16px rgba(255, 20, 147, 0.6)';
+            e.target.style.backgroundColor = '#4f7c03';
+            e.target.style.boxShadow = '0 6px 16px rgba(92, 148, 4, 0.6)';
           }}
           onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#FF1493';
-            e.target.style.boxShadow = '0 4px 12px rgba(255, 20, 147, 0.4)';
+            e.target.style.backgroundColor = '#5c9404';
+            e.target.style.boxShadow = '0 4px 12px rgba(92, 148, 4, 0.4)';
           }}
         >
           <FaArrowUp className="text-lg" />

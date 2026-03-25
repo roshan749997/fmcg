@@ -169,7 +169,7 @@ const MobileBottomNav = () => {
           <div className={`p-2 rounded-full transition-all duration-300 ${isActive('/') ? 'bg-pink-100 shadow-md scale-110' : 'group-hover:bg-pink-50 group-hover:scale-105'}`}>
             <HomeIcon isActive={isActive('/')} />
           </div>
-          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/') ? 'text-[#FF1493]' : 'text-gray-700'}`}>HOME</span>
+          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/') ? 'text-[#5c9404]' : 'text-gray-700'}`}>HOME</span>
         </a>
         
         <Link 
@@ -179,12 +179,12 @@ const MobileBottomNav = () => {
           <div className={`p-2 rounded-full transition-all duration-300 relative ${isActive('/wishlist') ? 'bg-pink-100 shadow-md scale-110' : 'group-hover:bg-pink-50 group-hover:scale-105'}`}>
             <WishlistIcon isActive={isActive('/wishlist')} />
             {wishlistCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-[#FF1493] to-[#8B2BE2] text-white text-[8px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center shadow-md border border-white">
+              <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-[#5c9404] to-[#8B2BE2] text-white text-[8px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center shadow-md border border-white">
                 {wishlistCount > 9 ? '9+' : wishlistCount}
               </span>
             )}
           </div>
-          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/wishlist') ? 'text-[#FF1493]' : 'text-gray-700'}`}>WISHLIST</span>
+          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/wishlist') ? 'text-[#5c9404]' : 'text-gray-700'}`}>WISHLIST</span>
         </Link>
         
         <Link 
@@ -194,12 +194,12 @@ const MobileBottomNav = () => {
           <div className={`p-2 rounded-full transition-all duration-300 relative ${isActive('/cart') ? 'bg-pink-100 shadow-md scale-110' : 'group-hover:bg-pink-50 group-hover:scale-105'}`}>
             <CartIcon isActive={isActive('/cart')} />
             {cartCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-[#FF1493] to-[#8B2BE2] text-white text-[8px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center shadow-md border border-white">
+              <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-[#5c9404] to-[#8B2BE2] text-white text-[8px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center shadow-md border border-white">
                 {cartCount > 9 ? '9+' : cartCount}
               </span>
             )}
           </div>
-          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/cart') ? 'text-[#FF1493]' : 'text-gray-700'}`}>CART</span>
+          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/cart') ? 'text-[#5c9404]' : 'text-gray-700'}`}>CART</span>
         </Link>
         
         <Link 
@@ -209,7 +209,7 @@ const MobileBottomNav = () => {
           <div className={`p-2 rounded-full transition-all duration-300 ${isActive('/profile') ? 'bg-pink-100 shadow-md scale-110' : 'group-hover:bg-pink-50 group-hover:scale-105'}`}>
             <AccountIcon isActive={isActive('/profile')} />
           </div>
-          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/profile') ? 'text-[#FF1493]' : 'text-gray-700'}`}>ACCOUNT</span>
+          <span className={`text-[8px] mt-0.5 font-semibold transition-colors ${isActive('/profile') ? 'text-[#5c9404]' : 'text-gray-700'}`}>ACCOUNT</span>
         </Link>
       </div>
     </div>

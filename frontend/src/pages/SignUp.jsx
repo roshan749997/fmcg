@@ -61,7 +61,7 @@ const SignUp = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#FFD1DC transparent' }}>
+      <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E7EFD9 transparent' }}>
 
             {/* Sign Up Form */}
             <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-4 sm:p-6 border border-gray-200/50 transition-all duration-300 relative">
@@ -297,7 +297,7 @@ const SignUp = () => {
                   Already have an account?{' '}
                   <Link
                     to="/signin"
-                    className="text-[#FF1493] hover:text-[#E01282] font-semibold transition-colors"
+                    className="text-[#5c9404] hover:text-[#5c9404] font-semibold transition-colors"
                   >
                     Sign in here
                   </Link>
@@ -313,11 +313,11 @@ const SignUp = () => {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #FFD1DC;
+          background: #E7EFD9;
           border-radius: 2px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #FFB6C1;
+          background: #DEE9CD;
         }
       `}</style>
       <ScrollToTop />

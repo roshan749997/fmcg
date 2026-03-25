@@ -55,7 +55,7 @@ const Wishlist = () => {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-gray-50 to-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF1493] mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5c9404] mb-4"></div>
         <p className="text-gray-600">Loading your wishlist...</p>
       </div>
     );
@@ -73,9 +73,9 @@ const Wishlist = () => {
         <p className="text-gray-600 mb-6 text-base">{error}</p>
         <button
           className="px-6 py-3 text-black rounded-xl border-2 border-black font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          style={{ backgroundColor: '#FFD1DC' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#FFB6C1'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#FFD1DC'}
+          style={{ backgroundColor: '#E7EFD9' }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#DEE9CD'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#E7EFD9'}
           onClick={loadWishlist}
         >
           Try Again
@@ -96,9 +96,9 @@ const Wishlist = () => {
         <p className="text-gray-600 mb-6 text-base">Tap the heart on any product to save it here.</p>
         <button
           className="px-6 py-3 text-black rounded-xl border-2 border-black font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          style={{ backgroundColor: '#FFD1DC' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#FFB6C1'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#FFD1DC'}
+          style={{ backgroundColor: '#E7EFD9' }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#DEE9CD'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#E7EFD9'}
           onClick={() => navigate('/')}
         >
           Browse Products
@@ -113,7 +113,7 @@ const Wishlist = () => {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col items-center text-center mb-4">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-2">My Wishlist</h1>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-[#FF1493] via-[#8B2BE2] to-[#FF1493] rounded-full shadow-sm"></div>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-[#5c9404] via-[#8B2BE2] to-[#5c9404] rounded-full shadow-sm"></div>
             <p className="text-gray-600 mt-2 text-sm sm:text-base">
               {items.length} {items.length === 1 ? 'item' : 'items'} saved
             </p>
@@ -140,8 +140,8 @@ const Wishlist = () => {
               </div>
               <div className="p-4 sm:p-5 bg-white">
                 {/* Gradient accent bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF1493] via-[#8B2BE2] to-[#FF1493] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[3rem] mb-2 group-hover:text-[#FF1493] transition-colors">{p.title}</h3>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#5c9404] via-[#8B2BE2] to-[#5c9404] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[3rem] mb-2 group-hover:text-[#5c9404] transition-colors">{p.title}</h3>
                 <div className="flex items-center gap-2 mt-3 mb-4">
                   <div className="flex items-center text-gray-900">
                     <FaRupeeSign className="w-4 h-4 text-gray-900" />
@@ -153,7 +153,7 @@ const Wishlist = () => {
                 </div>
                 <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                   <button
-                    className="text-sm font-semibold text-[#FF1493] hover:text-[#E01282] transition-colors"
+                    className="text-sm font-semibold text-[#5c9404] hover:text-[#5c9404] transition-colors"
                     onClick={() => navigate(`/product/${p._id}`)}
                   >
                     View Details

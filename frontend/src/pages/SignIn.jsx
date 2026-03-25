@@ -345,7 +345,7 @@ const SignIn = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#FFD1DC transparent' }}>
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 max-h-[95vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E7EFD9 transparent' }}>
 
             {/* Sign In Form */}
             <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 border border-gray-200/50 transition-all duration-300 relative mb-4 sm:mb-6">
@@ -680,7 +680,7 @@ const SignIn = () => {
                   Don't have an account?{' '}
                   <Link
                     to="/signup"
-                    className="text-[#FF1493] hover:text-[#E01282] font-semibold transition-colors"
+                    className="text-[#5c9404] hover:text-[#5c9404] font-semibold transition-colors"
                   >
                     Sign up here
                   </Link>
@@ -696,11 +696,11 @@ const SignIn = () => {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #FFD1DC;
+          background: #E7EFD9;
           border-radius: 2px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #FFB6C1;
+          background: #DEE9CD;
         }
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
