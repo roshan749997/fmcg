@@ -153,17 +153,17 @@ const KidzoSections = () => {
       {
         id: 2,
         image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421025/94c73c6e-e976-429e-962a-995e249ce108.png',
-        path: '/category/kids-clothing/winterwear'
+        path: '/category/beverages/energy-and-soft-drinks'
       },
       {
         id: 3,
         image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421010/cad31fe6-8aac-41dd-974d-2fa7f3e615d2.png',
-        path: '/category/footwear'
+        path: '/category/snacks-and-branded-foods/biscuits-and-cookies'
       },
       {
         id: 4,
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421061/b0e54120-4ec8-4143-b177-25b91ee3d5a7.png',
-        path: '/category/kids-clothing'
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774523448/b5bc93ec-e125-4e6f-9415-043b96835fbe.png',
+        path: '/category/beauty-and-hygiene'
       }
     ];
 
