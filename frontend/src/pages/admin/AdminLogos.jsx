@@ -40,14 +40,14 @@ const AdminLogos = () => {
 
       // Set defaults if not found
       if (!logosMap.header.url) {
-        logosMap.header.url = 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765607037/Pink_and_Purple_Playful_Kids_Store_Logo_150_x_60_px_1_ex8w7m.svg';
-        logosMap.header.alt = 'Kidzo';
+        logosMap.header.url = 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521755/Untitled_1500_x_500_px_1_t89yk3.png';
+        logosMap.header.alt = 'Kidzoo';
         logosMap.header.width = 'auto';
         logosMap.header.height = 'auto';
       }
       if (!logosMap.footer.url) {
-        logosMap.footer.url = 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765609203/2_qw44ed.svg';
-        logosMap.footer.alt = 'Kidzo';
+        logosMap.footer.url = 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521755/Untitled_1500_x_500_px_1_t89yk3.png';
+        logosMap.footer.alt = 'Kidzoo';
         logosMap.footer.width = 'auto';
         logosMap.footer.height = 'auto';
       }

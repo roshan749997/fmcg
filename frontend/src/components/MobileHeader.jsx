@@ -66,14 +66,10 @@ const MobileHeader = () => {
             {categories.map((category) => (
               <div key={category.name} className="relative group shrink-0" style={{ zIndex: activeCategory === category.name ? 100 : 'auto' }}>
                 <div
-                  className={`flex items-center font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer whitespace-nowrap px-1.5 sm:px-2 py-1.5 sm:py-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 touch-manipulation ${
+                  className={`flex items-center font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer whitespace-nowrap px-1.5 sm:px-2 py-1.5 sm:py-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 touch-manipulation ${
                     activeCategory === category.name ? 'bg-gray-50' : ''
                   }`}
-                  style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    letterSpacing: '0.5px',
-                    color: '#000000',
-                  }}
+                  style={{ color: '#0B1220' }}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (category.subcategories && category.subcategories.length > 0) {
@@ -124,12 +120,8 @@ const MobileHeader = () => {
                     <div className="bg-pink-50 border-b border-pink-200">
                       <button
                         type="button"
-                        className="w-full text-left block px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 group touch-manipulation active:bg-pink-100"
-                        style={{
-                          fontFamily: "'Bebas Neue', sans-serif",
-                          letterSpacing: '0.5px',
-                          color: '#000000',
-                        }}
+                        className="w-full text-left block px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 group touch-manipulation active:bg-pink-100"
+                        style={{ color: '#0B1220' }}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -163,12 +155,8 @@ const MobileHeader = () => {
                           <div className="flex items-center gap-2 sm:gap-3">
                             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-pink-400 group-hover:bg-pink-600 transition-colors"></div>
                             <span 
-                              className="font-bold flex-1"
-                              style={{
-                                fontFamily: "'Bebas Neue', sans-serif",
-                                letterSpacing: '0.3px',
-                                color: '#000000',
-                              }}
+                              className="font-semibold flex-1 tracking-wide"
+                              style={{ color: '#0B1220' }}
                             >
                               {subcategory.name}
                             </span>

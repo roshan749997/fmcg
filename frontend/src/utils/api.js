@@ -3,7 +3,10 @@
 // Prefer VITE_BACKEND_URL. If not set, fall back to localhost:5000 for development.
 // Make sure VITE_BACKEND_URL is defined for production builds (Vite requires VITE_ prefix).
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:5000';
-console.log('API_BASE_URL', API_BASE_URL);
+const LOGO_ENDPOINT_UNAVAILABLE_KEY = 'logo_endpoint_unavailable';
+let isLogoEndpointUnavailable =
+  typeof window !== 'undefined' && sessionStorage.getItem(LOGO_ENDPOINT_UNAVAILABLE_KEY) === '1';
+const logoRequestCache = new Map();
 
 function buildUrl(path) {
   // ensure path begins with /
@@ -195,7 +198,31 @@ export const api = {
   getPolicy: (type) => request(`/api/policies/${type}`, { method: 'GET' }),
   getContactInfo: () => request('/api/contact-info', { method: 'GET' }),
   getCategories: () => request('/api/categories', { method: 'GET' }),
-  getLogo: (type) => request(`/api/logos/${type}`, { method: 'GET' }),
+  getLogo: async (type) => {
+    if (isLogoEndpointUnavailable) return null;
+    if (logoRequestCache.has(type)) return logoRequestCache.get(type);
+
+    const logoPromise = (async () => {
+      try {
+        return await request(`/api/logos/${type}`, { method: 'GET' });
+      } catch (e) {
+        // Optional logo endpoint may not exist in some environments.
+        if (e?.status === 404) {
+          isLogoEndpointUnavailable = true;
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(LOGO_ENDPOINT_UNAVAILABLE_KEY, '1');
+          }
+          return null;
+        }
+        throw e;
+      } finally {
+        logoRequestCache.delete(type);
+      }
+    })();
+
+    logoRequestCache.set(type, logoPromise);
+    return logoPromise;
+  },
 
   // Admin endpoints
   admin: {

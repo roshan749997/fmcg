@@ -27,7 +27,7 @@ const AdminContactInfo = () => {
         email: data.email || '',
         phone: data.phone || '',
         address: data.address || '',
-        companyName: data.companyName || 'Kidzo',
+        companyName: data.companyName || 'Kidzoo',
       });
       setError('');
     } catch (err) {
@@ -144,7 +144,7 @@ const AdminContactInfo = () => {
                 onChange={handleChange}
                 required
                 className="w-full text-sm sm:text-base px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
-                placeholder="support@kidzo.com"
+                placeholder="support@kidzoo.com"
               />
             </div>
 

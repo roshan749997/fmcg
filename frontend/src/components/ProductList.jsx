@@ -1211,7 +1211,7 @@ const ProductList = ({ defaultCategory } = {}) => {
                     ? effectiveCategory
                     : 'All Products')}
             </h1>
-            <div className="w-16 sm:w-20 h-1 bg-black rounded-full shadow-sm"></div>
+            
             
           </div>
         </div>

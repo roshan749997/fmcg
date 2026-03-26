@@ -89,9 +89,6 @@ export const fetchSarees = async (category, subcategory = null, mainCategory = n
       }
     }
     
-    console.log("Fetching products from:", url);
-    console.log("Category:", category, "Subcategory:", subcategory);
-
     const response = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -110,17 +107,8 @@ export const fetchSarees = async (category, subcategory = null, mainCategory = n
     }
 
     const data = await response.json();
-    console.log("Products fetched:", data?.length || 0);
-    if (data?.length > 0) {
-      console.log("Sample product:", {
-        title: data[0].title,
-        category: data[0].category,
-        subcategory: data[0].subcategory
-      });
-    }
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error("Error fetching products:", error);
     // Return empty array instead of throwing error so page still loads
     return [];
   }
@@ -140,9 +128,7 @@ export const fetchSareeById = async (id, category = null) => {
         if (response.ok) {
           return await response.json();
         }
-      } catch (err) {
-        console.log(`Category-specific endpoint failed, trying legacy endpoint:`, err);
-      }
+      } catch (err) {}
     }
     
     // Fallback to legacy endpoint
@@ -152,7 +138,6 @@ export const fetchSareeById = async (id, category = null) => {
     if (!response.ok) throw new Error("Failed to fetch product details");
     return response.json();
   } catch (error) {
-    console.error("Error fetching product:", error);
     throw error;
   }
 };

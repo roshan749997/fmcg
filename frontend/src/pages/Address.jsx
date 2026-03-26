@@ -145,7 +145,7 @@ export default function AddressForm() {
         key,
         amount: order.amount,
         currency: order.currency,
-        name: 'Kidzo',
+        name: 'Kidzoo',
         description: 'Order Payment',
         order_id: order.id,
         prefill: { name: formData.name || '', contact: formData.mobile || '' },

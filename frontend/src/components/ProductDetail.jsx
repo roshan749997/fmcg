@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fetchSareeById, fetchSarees } from '../services/api';
@@ -283,10 +283,11 @@ const ProductDetail = () => {
     setLoadingRecommendations(true);
     try {
       const currentProductId = currentProduct._id || currentProduct.id;
-      const productCategory = currentProduct.category || category || 'kids-clothing';
+      const productCategory = currentProduct.category || category || '';
       
-      // Fetch products from same category
-      const allProducts = await fetchSarees(productCategory);
+      // Prefer same-category recommendations; if empty, fall back to all products.
+      const categoryProducts = productCategory ? await fetchSarees(productCategory) : [];
+      const allProducts = categoryProducts.length > 0 ? categoryProducts : await fetchSarees();
       
       // Filter out current product
       let filtered = allProducts.filter(p => (p._id || p.id) !== currentProductId);
@@ -368,15 +369,11 @@ const ProductDetail = () => {
           return;
         }
       } catch (apiError) {
-        console.log('Trending API not available, using fallback');
+        // Trending endpoint unavailable; continue with fallback products.
       }
       
-      // Fallback: Fetch from only 2-3 categories (faster)
-      const categories = ['kids-clothing', 'kids-accessories', 'footwear'];
-      const allProductsPromises = categories.map(cat => fetchSarees(cat).catch(() => []));
-      const allProductsArrays = await Promise.all(allProductsPromises);
-      const allProducts = allProductsArrays
-        .flat()
+      // Fallback: fetch all products so recommendations still render for FMCG.
+      const allProducts = (await fetchSarees())
         .filter(p => (p._id || p.id) !== currentProductId)
         .filter(hasDisplayablePrice);
 
@@ -421,11 +418,8 @@ const ProductDetail = () => {
     try {
       const currentProductId = currentProduct._id || currentProduct.id;
       
-      // Fetch from only 2-3 categories (faster)
-      const categories = ['kids-clothing', 'kids-accessories', 'footwear'];
-      const allProductsPromises = categories.map(cat => fetchSarees(cat).catch(() => []));
-      const allProductsArrays = await Promise.all(allProductsPromises);
-      const allProducts = allProductsArrays.flat().filter(hasDisplayablePrice);
+      // Fetch all products so section renders even without legacy category names.
+      const allProducts = (await fetchSarees()).filter(hasDisplayablePrice);
 
       // Filter products that are on sale (optimized)
       const saleItems = [];
@@ -748,10 +742,10 @@ const ProductDetail = () => {
                 <h3 className="text-lg font-medium text-[#212121] mb-3">Product details</h3>
                 <div className="grid sm:grid-cols-[170px_1fr] gap-y-2 text-sm">
                   {specRows.map(([label, value]) => (
-                    <>
-                      <div key={`${label}-label`} className="text-[#878787]">{label}</div>
-                      <div key={`${label}-value`} className="text-[#212121]">{value}</div>
-                    </>
+                    <Fragment key={label}>
+                      <div className="text-[#878787]">{label}</div>
+                      <div className="text-[#212121]">{value}</div>
+                    </Fragment>
                   ))}
                 </div>
               </div>
@@ -816,9 +810,12 @@ const ProductDetail = () => {
 
             {/* On Sale Section */}
             <div id="sale-section" className="mb-8 sm:mb-12">
-              {(saleProducts.length > 0 || loadingSale || shouldLoadSale) && (
+              <div className="mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-black">On Sale</h3>
+                <p className="text-xs sm:text-sm text-gray-700">Trending Now - Popular picks across all categories</p>
+              </div>
+              {(loadingSale || saleProducts.length > 0 || shouldLoadSale) ? (
                 <>
-                  <h3 className="text-base sm:text-lg font-semibold text-black mb-3 sm:mb-4">On Sale</h3>
                   {loadingSale ? (
                     <div className="flex gap-4 overflow-x-auto pb-4">
                       {[...Array(4)].map((_, i) => (
@@ -849,6 +846,8 @@ const ProductDetail = () => {
                     </div>
                   )}
                 </>
+              ) : (
+                <p className="text-sm text-gray-500">No products available right now.</p>
               )}
             </div>
 
@@ -893,11 +892,14 @@ const ProductDetail = () => {
 
             {/* Trending Now - Popular picks across all categories */}
             <div id="trending-section" className="mb-8 sm:mb-12">
-              {(trendingProducts.length > 0 || loadingTrending || shouldLoadTrending) && (
+              <div className="mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-black">
+                  Trending Now
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-700">Popular picks across all categories</p>
+              </div>
+              {(loadingTrending || trendingProducts.length > 0 || shouldLoadTrending) ? (
                 <>
-                  <h3 className="text-base sm:text-lg font-semibold text-black mb-3 sm:mb-4">
-                    Trending Now - Popular picks across all categories
-                  </h3>
                   {loadingTrending ? (
                     <div className="flex gap-4 overflow-x-auto pb-4">
                       {[...Array(4)].map((_, i) => (
@@ -928,6 +930,8 @@ const ProductDetail = () => {
                     </div>
                   )}
                 </>
+              ) : (
+                <p className="text-sm text-gray-500">No products available right now.</p>
               )}
             </div>
           </div>

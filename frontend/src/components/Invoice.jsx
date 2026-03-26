@@ -30,7 +30,7 @@ const Invoice = ({ order, user, onPrint }) => {
       <div className="border-b-2 border-gray-200 pb-6 mb-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Kidzo</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Kidzoo</h1>
             <p className="text-gray-600">Your trusted shopping partner</p>
           </div>
           <div className="text-right">

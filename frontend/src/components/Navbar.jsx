@@ -27,8 +27,8 @@ const Navbar = () => {
   const [userAvatar, setUserAvatar] = useState('');
   const [avatarError, setAvatarError] = useState(false);
   const [headerLogo, setHeaderLogo] = useState({
-    url: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765607037/Pink_and_Purple_Playful_Kids_Store_Logo_150_x_60_px_1_ex8w7m.svg',
-    alt: 'Kidzo',
+    url: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521755/Untitled_1500_x_500_px_1_t89yk3.png',
+    alt: 'Kidzoo',
     width: 'auto',
     height: 'auto',
   });
@@ -41,7 +41,7 @@ const Navbar = () => {
         if (logo) {
           setHeaderLogo({ 
             url: logo.url, 
-            alt: logo.alt || 'Kidzo',
+            alt: logo.alt || 'Kidzoo',
             width: logo.width || 'auto',
             height: logo.height || 'auto',
           });
@@ -329,14 +329,14 @@ const Navbar = () => {
                 style={{
                   ...(headerLogo.width !== 'auto' && { width: headerLogo.width }),
                   ...(headerLogo.height !== 'auto' && { height: headerLogo.height }),
-                  maxWidth: '100%',
+                  maxWidth: '90%',
                   objectFit: 'contain',
                 }}
                 className={headerLogo.width === 'auto' && headerLogo.height === 'auto' 
                   ? "h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain" 
                   : "object-contain"}
                 onError={(e) => {
-                  e.target.src = 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765607037/Pink_and_Purple_Playful_Kids_Store_Logo_150_x_60_px_1_ex8w7m.svg';
+                  e.target.src = 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521755/Untitled_1500_x_500_px_1_t89yk3.png';
                 }}
               />
             </Link>
@@ -665,7 +665,7 @@ const Navbar = () => {
             {/* Mobile Categories Accordion */}
             <div className="mt-4 px-3 sm:px-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wider">
+                <h3 className="text-[12px] sm:text-sm font-semibold text-gray-900 tracking-wide leading-tight">
                   Shop by Category
                 </h3>
               </div>
@@ -691,7 +691,7 @@ const Navbar = () => {
                         }}
                         className="w-full px-3 sm:px-4 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 active:bg-gray-100"
                       >
-                        <span className="font-bold text-sm sm:text-base text-gray-900 uppercase whitespace-nowrap overflow-hidden text-ellipsis">
+                        <span className="font-semibold text-sm sm:text-base text-gray-900 tracking-wide whitespace-nowrap overflow-hidden text-ellipsis leading-tight">
                           {category.name}
                         </span>
 
@@ -725,7 +725,7 @@ const Navbar = () => {
                                   }}
                                   className="w-full text-left px-2 py-2 rounded-md hover:bg-gray-50 active:bg-gray-100 touch-manipulation"
                                 >
-                                  <span className="text-sm text-gray-900">
+                                  <span className="text-[13px] sm:text-sm font-medium text-gray-900 tracking-wide leading-tight">
                                     {subcategory.name}
                                   </span>
                                 </button>
