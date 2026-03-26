@@ -214,44 +214,36 @@ const KidzoSections = () => {
   const PremiumCollection = () => {
     const productData = [
       {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765545802/Blue_Pink_and_White_Modern_Kids_Fashion_Instagram_Post_1_jlr5f8.png',
-        name: 'Kids Clothing Set',
-        path: '/category/kids-clothing'
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521094/0dbfe300-b764-4e49-a966-fcf5a9df5b7b.png',
+        name: 'Beauty & Hygiene',
+        path: '/category/beauty-and-hygiene',
+        description: 'Skin, hair, bath and personal care essentials.',
+        cta: 'Shop Beauty',
+        bgTint: 'bg-rose-50'
       },
       {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765547808/unnamed_vaowmm.jpg',
-        name: 'Winter Wear Collection',
-        path: '/category/kids-clothing/winterwear'
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521771/70ff75c5-db6d-4658-97f8-53d7853c751a.png',
+        name: 'Beverages',
+        path: '/category/beverages',
+        description: 'Tea, coffee, juices and refreshing drinks.',
+        cta: 'Shop Drinks',
+        bgTint: 'bg-cyan-50'
       },
       {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538765/unnamed_yt1lzi.jpg',
-        name: 'Girls Fashion Set',
-        path: '/category/kids-clothing/girls-cloths'
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774522325/d5982c91-6ce8-416d-80d9-eeab59e7d7de.png',
+        name: 'Cleaning & Household',
+        path: '/category/cleaning-and-household',
+        description: 'Daily home cleaning and household utility products.',
+        cta: 'Shop Home Care',
+        bgTint: 'bg-emerald-50'
       },
       {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765546653/unnamed_a17jn6.jpg',
-        name: 'Kids Accessories Pack',
-        path: '/category/kids-accessories'
-      },
-      {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538961/unnamed_hqycjk.jpg',
-        name: 'Kids Footwear',
-        path: '/category/footwear'
-      },
-      {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765538964/unnamed_fn6esy.jpg',
-        name: 'Baby Care Essentials',
-        path: '/category/baby-care'
-      },
-      {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765546805/unnamed_ofelua.jpg',
-        name: 'Premium Toys',
-        path: '/category/toys'
-      },
-      {
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765547808/unnamed_vaowmm.jpg',
-        name: 'Boys Collection',
-        path: '/category/kids-clothing/boys-cloth'
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774522493/70425225-2906-4dba-a9a1-9e0b857c7a63.png',
+        name: 'Snacks & Branded Foods',
+        path: '/category/snacks-and-branded-foods',
+        description: 'Biscuits, namkeen, ready-to-eat and more.',
+        cta: 'Shop Snacks',
+        bgTint: 'bg-amber-50'
       }
     ];
 
@@ -272,31 +264,51 @@ const KidzoSections = () => {
             >
               <span className="inline-block">PREMIUM COLLECTION</span>
             </h2>
+            <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+              Explore top categories with handpicked essentials for everyday needs.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5 w-full px-2 sm:px-3 md:px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 w-full px-2 sm:px-3 md:px-4">
             {productData.map((product, index) => (
               <div
                 key={index}
                 onClick={() => handleCategoryClick(product.path)}
-                className="group overflow-hidden rounded-lg sm:rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 w-full cursor-pointer"
+                className={`group relative overflow-hidden rounded-xl sm:rounded-2xl ${product.bgTint} shadow-md hover:shadow-2xl transition-all duration-300 w-full cursor-pointer border border-gray-100 hover:-translate-y-1`}
               >
-                <div className="relative w-full aspect-square bg-gray-100 overflow-hidden">
+                <div className="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'https://via.placeholder.com/400x500/1F2937/FFFFFF?text=Product+Image';
                     }}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-white bg-[#5c9404] shadow">
+                      Top Category
+                    </span>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                    <h3 className="text-white font-semibold text-sm sm:text-base md:text-lg leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.65)]">
+                      {product.name}
+                    </h3>
+                  </div>
                 </div>
-                <div className="p-3 sm:p-4 md:p-5 bg-[#4A4A4D]">
-                  <h3 className="text-white font-semibold text-sm sm:text-base md:text-lg text-center leading-tight line-clamp-2">
-                    {product.name}
-                  </h3>
+                <div className={`px-3 py-3 sm:px-4 sm:py-4 ${product.bgTint}`}>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed min-h-[36px] sm:min-h-[40px]">
+                    {product.description}
+                  </p>
+                  <div className="mt-3">
+                    <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-white bg-slate-700">
+                      {product.cta}
+                      <span aria-hidden="true">{'->'}</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
