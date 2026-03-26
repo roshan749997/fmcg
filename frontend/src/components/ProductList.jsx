@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FaRupeeSign, FaSpinner, FaFilter, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaRupeeSign, FaSpinner, FaFilter, FaTimes, FaChevronDown, FaChevronUp, FaStar, FaRegStar } from 'react-icons/fa';
 import { fetchSarees } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
 import ScrollToTop from './ScrollToTop';
+import ProductTypeSelector from './ProductTypeSelector';
 import { useHeaderColor } from '../utils/useHeaderColor';
 import { categoryTree, slugifyCategory } from '../data/categoryTree';
 
@@ -60,6 +61,36 @@ const styles = `
     position: sticky !important;
   }
 `;
+
+const getProductMrp = (p) => Number(p?.originalPrice ?? p?.mrp ?? 0) || 0;
+const getProductPrice = (p) =>
+  Number(p?.price ?? p?.mrp ?? p?.originalPrice ?? p?.finalPrice ?? 0) || 0;
+const hasDisplayablePrice = (p) => getProductPrice(p) > 0;
+
+const getProductRatingValue = (p) => {
+  const r = p?.rating ?? p?.averageRating ?? p?.ratingAvg ?? p?.ratingsAvg ?? p?.product_info?.rating;
+  const n = Number(r);
+  // Fallback matches ProductDetail which currently shows a static rating.
+  if (Number.isFinite(n) && n > 0) return n;
+  return 4.2;
+};
+
+const getProductBrand = (p) =>
+  p?.product_info?.brand ||
+  p?.brand ||
+  p?.product_info?.manufacturer ||
+  p?.manufacturer ||
+  p?.product_info?.brandName ||
+  'KIDZO';
+
+const getProductShortDescription = (p) =>
+  String(
+    p?.shortDescription ||
+      p?.description ||
+      p?.product_info?.shortDescription ||
+      p?.product_info?.description ||
+      ''
+  ).trim();
 
 const ProductList = ({ defaultCategory } = {}) => {
   const { categoryName, subCategoryName, mainCategory } = useParams();
@@ -416,8 +447,9 @@ const ProductList = ({ defaultCategory } = {}) => {
         });
         const data = await fetchSarees(requestCategory, requestSubCategory, requestMainCategory);
         console.log('ProductList - Received products:', data?.length || 0);
-        setProducts(Array.isArray(data) ? data : []);
-        setFilteredProducts(Array.isArray(data) ? data : []);
+        const pricedProducts = (Array.isArray(data) ? data : []).filter(hasDisplayablePrice);
+        setProducts(pricedProducts);
+        setFilteredProducts(pricedProducts);
       } catch (err) {
         console.error('Failed to load products:', err);
         setError('Failed to load products. Please try again later.');
@@ -530,6 +562,9 @@ const ProductList = ({ defaultCategory } = {}) => {
         );
       });
     }
+
+    // Always hide products with invalid/zero price.
+    result = result.filter(hasDisplayablePrice);
     
     setFilteredProducts(result);
     // Reset display count when filters change
@@ -637,34 +672,16 @@ const ProductList = ({ defaultCategory } = {}) => {
     selectedWaterResistance.length
   ].reduce((a, b) => a + b, 0);
 
-  const FilterContent = () => (
+  const FilterContent = ({ showProductTypeSelector = true } = {}) => (
     <div className="space-y-6">
-      {categoryNavContext.activeSubNode && categoryNavContext.sidebarItems.length > 0 && (
-        <div className="border-b border-gray-200 pb-6">
-          <h4 className="text-base font-semibold text-black mb-1">Select Product Type</h4>
-          <p className="text-xs text-gray-600 mb-3">Now choose an item under <span className="font-medium text-black">{categoryNavContext.activeSubNode.name}</span>.</p>
-          <div className="space-y-2.5 max-h-72 overflow-y-auto custom-scrollbar pr-2">
-            {categoryNavContext.sidebarItems.map((item) => {
-              const itemPath = `/category/${slugifyCategory(categoryNavContext.mainNode.name)}/${slugifyCategory(categoryNavContext.activeSubNode.name)}/${slugifyCategory(item)}`;
-              const isActiveItem = slugifyCategory(mainCategory ? subCategoryName : '') === slugifyCategory(item);
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => navigate(itemPath)}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${
-                    isActiveItem ? 'bg-gray-100 border border-gray-300 font-semibold text-black' : 'text-black border border-transparent hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{item}</span>
-                    {isActiveItem && <span className="text-xs text-gray-600">Active</span>}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {showProductTypeSelector && (
+        <ProductTypeSelector
+          activeSubNode={categoryNavContext.activeSubNode}
+          sidebarItems={categoryNavContext.sidebarItems}
+          mainNode={categoryNavContext.mainNode}
+          mainCategory={mainCategory}
+          subCategoryName={subCategoryName}
+        />
       )}
 
       <div className="flex justify-end items-center pb-4 border-b border-gray-200">
@@ -1177,15 +1194,15 @@ const ProductList = ({ defaultCategory } = {}) => {
         </div>
       )}
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
         {/* Modern Header */}
-        <div className="mb-2 sm:mb-4">
-          <div className="flex flex-col items-center text-center mb-2 sm:mb-3">
+        <div className="mb-1 sm:mb-2">
+          <div className="flex flex-col items-center text-center mb-1 sm:mb-2">
             <h1 
-              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-1 sm:mb-2 uppercase text-black"
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-1 uppercase text-black"
               style={{
                 fontFamily: "'Bebas Neue', sans-serif",
-                letterSpacing: '2px',
+                letterSpacing: '1.2px',
               }}
             >
               {effectiveSubCategory
@@ -1194,33 +1211,43 @@ const ProductList = ({ defaultCategory } = {}) => {
                     ? effectiveCategory
                     : 'All Products')}
             </h1>
-            <div className="w-24 sm:w-32 h-1 sm:h-1.5 bg-black rounded-full shadow-sm"></div>
-            <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base hidden sm:block">
-              Discover our premium collection
-            </p>
+            <div className="w-16 sm:w-20 h-1 bg-black rounded-full shadow-sm"></div>
+            
           </div>
         </div>
 
-        <div ref={filterContainerRef} className="flex gap-6 lg:gap-8 relative filter-sticky-container" style={{ position: 'relative', overflow: 'visible' }}>
-          {/* Desktop Sidebar Filters - Sticky below navbar */}
-          <aside className="hidden lg:block w-72 flex-shrink-0" style={{ alignSelf: 'flex-start', position: 'relative' }}>
+        <div
+          ref={filterContainerRef}
+          className="flex gap-6 lg:gap-8 relative filter-sticky-container lg:h-[calc(100vh-var(--app-header-height,80px)-2rem)]"
+          style={{ position: 'relative', overflow: 'visible' }}
+        >
+          {/* Desktop Left Panel (20%): Sticky Product Type selector */}
+          <aside className="hidden lg:block lg:w-1/5 lg:max-w-[20%] flex-shrink-0" style={{ alignSelf: 'flex-start', position: 'relative' }}>
             <div 
               ref={filterSidebarRef}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 overflow-y-auto custom-scrollbar filter-sticky-sidebar"
+              className="filter-sticky-sidebar"
               style={{ 
                 position: 'sticky',
                 top: `${navbarHeight}px`,
-                maxHeight: `calc(100vh - ${navbarHeight}px)`,
                 zIndex: 40,
-                marginTop: 0
+                marginTop: 0,
+                overflow: 'visible'
               }}
             >
-              <FilterContent />
+              <div className="bg-white rounded-xl border border-gray-300 p-3">
+                <ProductTypeSelector
+                  activeSubNode={categoryNavContext.activeSubNode}
+                  sidebarItems={categoryNavContext.sidebarItems}
+                  mainNode={categoryNavContext.mainNode}
+                  mainCategory={mainCategory}
+                  subCategoryName={subCategoryName}
+                />
+              </div>
             </div>
           </aside>
 
           {/* Main Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 lg:w-4/5 lg:max-w-[80%] min-w-0 lg:h-full lg:overflow-y-auto custom-scrollbar lg:pr-1">
             {/* Mobile Filter Button & Active Filters */}
             <div className="lg:hidden mb-3 space-y-2">
               <button 
@@ -1342,16 +1369,16 @@ const ProductList = ({ defaultCategory } = {}) => {
               )}
             </div>
 
-            {/* Modern Results Bar */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-8 bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm sm:shadow-md border border-gray-100">
-              <p className="text-sm sm:text-base text-gray-700">
-                Showing <span className="font-bold text-gray-900 text-base sm:text-lg">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
+            {/* Compact Results Bar */}
+            <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5 bg-white px-3 sm:px-4 py-2 rounded-lg border border-gray-100 shadow-sm">
+              <p className="text-xs sm:text-sm text-gray-700 whitespace-nowrap">
+                Showing <span className="font-semibold text-gray-900">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
               </p>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <label htmlFor="sort" className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">Sort:</label>
+              <div className="flex items-center gap-2">
+                <label htmlFor="sort" className="text-xs font-medium text-gray-600 whitespace-nowrap">Sort</label>
                 <select 
                   id="sort" 
-                  className="text-xs sm:text-sm border-2 border-gray-200 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 focus:ring-2 focus:ring-black focus:border-black bg-white font-medium text-black cursor-pointer transition-all hover:border-black"
+                  className="text-xs sm:text-sm border border-gray-200 rounded-md px-2.5 sm:px-3 py-1.5 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 bg-white font-medium text-gray-900 cursor-pointer transition-colors hover:border-gray-300"
                   onChange={(e) => {
                     const sorted = [...filteredProducts];
                     switch(e.target.value) {
@@ -1431,63 +1458,73 @@ const ProductList = ({ defaultCategory } = {}) => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4 md:gap-5 lg:gap-6">
-                  {filteredProducts.slice(0, displayCount).map((p) => (
-                  <div
-                    key={p._id || p.title}
-                    className="group bg-white overflow-hidden rounded-xl sm:rounded-2xl shadow-sm sm:shadow-md hover:shadow-xl sm:hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gray-100 hover:border-black transform hover:-translate-y-1 sm:hover:-translate-y-2"
-                    onClick={() => handleCardClick(p)}
-                  >
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-5 lg:gap-6">
+                  {filteredProducts.slice(0, displayCount).map((p) => {
+                    const price = getProductPrice(p);
+                    const brand = getProductBrand(p);
+                    const shortDescription = getProductShortDescription(p);
+
+                    return (
+                      <div
+                        key={p._id || p.title}
+                        className="group bg-white overflow-hidden shadow-sm transition-all duration-500 cursor-pointer border border-gray-100 transform "
+                        onClick={() => handleCardClick(p)}
+                      >
                     <div className="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden flex items-center justify-center">
                       <img
                         src={getProductImage(p, 'image1')}
                         alt={p.title}
-                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-transform duration-300"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = placeholders.productList;
                         }}
                         loading="lazy"
                       />
-                      {(p.discountPercent > 0 || p.discount) && (
-                        <span className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black text-white text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-lg shadow-md sm:shadow-lg uppercase">
-                          {p.discountPercent || p.discount}% OFF
-                        </span>
-                      )}
                       {/* Gradient overlay on hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
 
                     <div className="relative p-3 sm:p-4 md:p-5 bg-white">
-                      {/* Accent bar */}
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                      
-                      <div className="flex justify-between items-start mb-1 sm:mb-2">
-                        <h3 className="text-xs font-semibold text-black uppercase tracking-wide line-clamp-1">
-                          {p.product_info?.manufacturer || 'VARNICRAFTS'}
-                        </h3>
-                      </div>
-                      
+                      {/* No underline accent on hover */}
                       <p className="text-sm sm:text-base font-bold text-black line-clamp-2 mb-2 sm:mb-3 min-h-[2.5rem] sm:min-h-[3rem] transition-colors">
                         {p.title || 'Untitled Product'}
                       </p>
-                
-                      <div className="flex items-baseline gap-1.5 sm:gap-2 mt-2 sm:mt-3">
+
+                      <p className="text-xs sm:text-sm text-gray-700/80 line-clamp-2 mb-2 min-h-[1.5rem] transition-colors">
+                        {shortDescription || ' '}
+                      </p>
+
+                      <h3 className="text-xs font-semibold text-[#5c9404] uppercase tracking-wide line-clamp-1 mb-2">
+                        {brand}
+                      </h3>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-2 mb-2">
                         <div className="flex items-center">
-                          <FaRupeeSign className="h-3 w-3 sm:h-4 sm:w-4 text-black" />
-                          <span className="text-lg sm:text-xl font-bold text-black ml-0.5">
-                            {p.price?.toLocaleString() || Math.round(p.mrp - p.mrp * ((p.discountPercent || 0) / 100)).toLocaleString()}
-                          </span>
+                          {Array.from({ length: 5 }).map((_, idx) => {
+                            const ratingRounded = Math.round(getProductRatingValue(p));
+                            const isFilled = idx < ratingRounded;
+                            return isFilled ? (
+                              <FaStar key={idx} className="w-3 h-3 text-amber-500" />
+                            ) : (
+                              <FaRegStar key={idx} className="w-3 h-3 text-amber-500" />
+                            );
+                          })}
                         </div>
-                        {p.mrp && p.mrp > (p.price || 0) && (
-                          <span className="text-xs sm:text-sm text-gray-400 line-through">
-                            ₹{p.mrp.toLocaleString()}
-                          </span>
-                        )}
+                        <span className="text-xs font-medium text-gray-700">{getProductRatingValue(p).toFixed(1)}</span>
+                      </div>
+
+                      {/* Price */}
+                      <div className="mt-3">
+                        <span className="text-lg sm:text-xl font-bold text-green-600">
+                          ₹{Math.round(price).toLocaleString()}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                      </div>
+                    );
+                  })}
                 </div>
                 
                 {/* Infinite Scroll Sentinel & Loading Indicator */}

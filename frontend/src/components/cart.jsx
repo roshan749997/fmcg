@@ -179,9 +179,6 @@ function Cart() {
                       <div>
                         <p className="text-base sm:text-lg font-bold text-[#5c9404]">₹{(item.price * (item.quantity || 1)).toLocaleString()}</p>
                         <p className="text-[11px] text-gray-500">Line total</p>
-                        {item.originalPrice > item.price && (
-                          <p className="text-[11px] text-gray-500 line-through mt-0.5">₹{item.originalPrice.toLocaleString()}</p>
-                        )}
                       </div>
                     </div>
                   </div>

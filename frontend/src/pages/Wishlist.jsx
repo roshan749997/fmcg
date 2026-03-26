@@ -110,11 +110,6 @@ const Wishlist = () => {
                   <div className="mt-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-black">₹{Math.round(item.price || 0).toLocaleString()}</span>
-                      {item.originalPrice > item.price && item.originalPrice > 0 && (
-                        <span className="text-sm text-gray-400 line-through">
-                          ₹{Math.round(item.originalPrice).toLocaleString()}
-                        </span>
-                      )}
                     </div>
                   </div>
 

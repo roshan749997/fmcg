@@ -80,10 +80,10 @@ const productSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// 💡 Virtual field: Automatically calculate final price after discount
+// Virtual field: Final price to display (no discount applied)
+// Your requirement is to remove % discount from all customer-facing calculations.
 productSchema.virtual("price").get(function () {
-  const discount = (this.mrp * this.discountPercent) / 100;
-  return Math.round(this.mrp - discount);
+  return Math.round(this.mrp || 0);
 });
 
 productSchema.pre("validate", function setDatasetDerivedFields(next) {

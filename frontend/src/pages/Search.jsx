@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { FaRupeeSign, FaFilter, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaRupeeSign, FaFilter, FaTimes, FaChevronDown, FaChevronUp, FaStar, FaRegStar } from 'react-icons/fa';
 import { searchProducts } from '../services/api';
 import { placeholders, getProductImage } from '../utils/imagePlaceholder';
 import ScrollToTop from '../components/ScrollToTop';
@@ -15,6 +15,35 @@ const styles = `
     scrollbar-width: none;
   }
 `;
+
+const getProductMrp = (p) => Number(p?.mrp ?? p?.originalPrice ?? 0) || 0;
+const getProductPrice = (p) =>
+  Number(p?.price ?? p?.mrp ?? p?.originalPrice ?? p?.finalPrice ?? 0) || 0;
+const hasDisplayablePrice = (p) => getProductPrice(p) > 0;
+
+const getProductRatingValue = (p) => {
+  const r = p?.rating ?? p?.averageRating ?? p?.ratingAvg ?? p?.ratingsAvg ?? p?.product_info?.rating;
+  const n = Number(r);
+  if (Number.isFinite(n) && n > 0) return n;
+  return 4.2;
+};
+
+const getProductBrand = (p) =>
+  p?.product_info?.brand ||
+  p?.brand ||
+  p?.product_info?.manufacturer ||
+  p?.manufacturer ||
+  p?.product_info?.brandName ||
+  'KIDZO';
+
+const getProductShortDescription = (p) =>
+  String(
+    p?.shortDescription ||
+      p?.description ||
+      p?.product_info?.shortDescription ||
+      p?.product_info?.description ||
+      ''
+  ).trim();
 
 const useQuery = () => {
   const { search } = useLocation();
@@ -91,14 +120,14 @@ const Search = () => {
   
   // Apply filters to results
   useEffect(() => {
-    let result = [...results];
+    let result = [...results].filter(hasDisplayablePrice);
     
     // Filter by price range
     if (selectedPriceRange) {
       const range = priceRanges.find(r => r.id === selectedPriceRange);
       if (range) {
         result = result.filter(p => {
-          const price = p.price || (p.mrp - p.mrp * ((p.discountPercent || 0) / 100));
+          const price = p.price || p.mrp || p.originalPrice || 0;
           return price >= range.min && price <= range.max;
         });
       }
@@ -169,8 +198,9 @@ const Search = () => {
         const data = await searchProducts(q);
         const items = data?.results || [];
         if (active) {
-          setResults(items);
-          setFilteredResults(items);
+          const pricedItems = items.filter(hasDisplayablePrice);
+          setResults(pricedItems);
+          setFilteredResults(pricedItems);
         }
       } catch (e) {
         if (active) setError('Failed to load results');
@@ -375,8 +405,13 @@ const Search = () => {
               </div>
 
               {/* Product Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-                {filteredResults.map((p) => (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+                {filteredResults.map((p) => {
+                  const price = getProductPrice(p);
+                  const brand = getProductBrand(p);
+                  const shortDescription = getProductShortDescription(p);
+
+                  return (
               <div
                 key={p._id || p.title}
                 className="group bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100 hover:border-pink-100"
@@ -386,47 +421,53 @@ const Search = () => {
                     <img
                       src={getProductImage(p, 'image1') || p.image || placeholders.productList}
                       alt={p.title || p.name || 'Product'}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500"
                       onError={(e) => { 
                         e.target.onerror = null;
                         e.target.src = placeholders.productList; 
                       }}
                     />
-                    {(p.discountPercent > 0 || p.discount) && (
-                      <span className="absolute top-3 right-3 bg-white text-green-600 border border-green-600 text-xs font-bold px-2 py-1 rounded-full">
-                        {p.discountPercent || p.discount}% OFF
-                      </span>
-                    )}
                   </div>
 
                   <div className="relative p-4">
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7A2A2A] via-[#A56E2C] to-[#C89D4B] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-10"></div>
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="text-sm font-medium text-gray-600 line-clamp-1">
-                        {p.product_info?.manufacturer || 'VARNICRAFTS'}
-                      </h3>
-                    </div>
                     <p className="text-sm font-bold text-gray-900 line-clamp-2 mb-2 min-h-[2.5rem]">
                       {p.title || p.name || 'Untitled Product'}
                     </p>
-                
-                    <div className="flex items-baseline gap-1.5 mt-2">
+
+                    <p className="text-xs sm:text-sm text-gray-700/80 line-clamp-2 mb-2 min-h-[1.5rem] transition-colors">
+                      {shortDescription || ' '}
+                    </p>
+
+                    <h3 className="text-xs font-semibold text-[#5c9404] uppercase tracking-wide line-clamp-1 mb-2">
+                      {brand}
+                    </h3>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-2">
                       <div className="flex items-center">
-                        <FaRupeeSign className="h-3.5 w-3.5 text-gray-900" />
-                        <span className="text-lg font-bold text-gray-900 ml-0.5">
-                          {p.price?.toLocaleString() || (p.mrp ? Math.round(p.mrp - p.mrp * ((p.discountPercent || 0) / 100)).toLocaleString() : '0')}
-                        </span>
+                        {Array.from({ length: 5 }).map((_, idx) => {
+                          const ratingRounded = Math.round(getProductRatingValue(p));
+                          const isFilled = idx < ratingRounded;
+                          return isFilled ? (
+                            <FaStar key={idx} className="w-3 h-3 text-amber-500" />
+                          ) : (
+                            <FaRegStar key={idx} className="w-3 h-3 text-amber-500" />
+                          );
+                        })}
                       </div>
-                      {p.mrp && (
-                        <span className="text-xs text-gray-400 line-through">
-                          ₹{p.mrp.toLocaleString()}
-                        </span>
-                      )}
+                      <span className="text-xs font-medium text-gray-700">{getProductRatingValue(p).toFixed(1)}</span>
+                    </div>
+                
+                    <div className="mt-3">
+                      <span className="text-lg sm:text-xl font-bold text-green-600">
+                        ₹{Math.round(price).toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </Link>
               </div>
-            ))}
+            );
+                })}
               </div>
             </div>
           </div>

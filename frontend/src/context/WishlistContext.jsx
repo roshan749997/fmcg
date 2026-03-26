@@ -21,14 +21,13 @@ const normalizeProduct = (p) => {
   const image = getProductImage(p, 'image1') || placeholders.productList;
 
   const mrp = typeof p.mrp === 'number' ? p.mrp : Number(p.mrp ?? 0) || 0;
-  const discountPercent = typeof p.discountPercent === 'number' ? p.discountPercent : Number(p.discountPercent ?? 0) || 0;
-  const computedFinalPrice = mrp > 0 ? Math.round(mrp - (mrp * discountPercent) / 100) : 0;
 
   return {
     id,
     name,
     image,
-    price: p.price ?? p.finalPrice ?? computedFinalPrice ?? 0,
+    // No % discount: use server `price` if present, otherwise plain MRP.
+    price: p.price ?? p.finalPrice ?? mrp ?? 0,
     originalPrice: p.originalPrice ?? mrp ?? 0,
     product: p,
   };

@@ -111,9 +111,9 @@ export const verifyPayment = async (req, res) => {
         if (product && typeof product.price === 'number') {
           base = Number(product.price) || 0;
         } else {
+          // No % discount: base amount is always the MRP.
           const mrp = Number(product?.mrp) || 0;
-          const discountPercent = Number(product?.discountPercent) || 0;
-          base = Math.round(mrp - (mrp * discountPercent) / 100) || 0;
+          base = Math.round(mrp) || 0;
         }
         
         return { 
@@ -189,9 +189,9 @@ export const createCodOrder = async (req, res) => {
         if (product && typeof product.price === 'number') {
           base = Number(product.price) || 0;
         } else {
+          // No % discount: base amount is always the MRP.
           const mrp = Number(product?.mrp) || 0;
-          const discountPercent = Number(product?.discountPercent) || 0;
-          base = Math.round(mrp - (mrp * discountPercent) / 100) || 0;
+          base = Math.round(mrp) || 0;
         }
         
         return { 

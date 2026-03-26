@@ -9,6 +9,36 @@ import ScrollToTop from './ScrollToTop';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
+const parseRupeeValueSafe = (value) => {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  const numeric = String(value).replace(/[^0-9.]/g, '');
+  const parsed = Number(numeric);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const resolveDisplayPrice = (product) => {
+  if (!product || typeof product !== 'object') return 0;
+  const candidates = [
+    product.price,
+    product.finalPrice,
+    product.sellingPrice,
+    product.mrp,
+    product.MRP,
+    product.originalPrice,
+    product?.sourceData?.mrp,
+    product?.sourceData?.MRP,
+  ];
+
+  for (const value of candidates) {
+    const parsed = parseRupeeValueSafe(value);
+    if (parsed > 0) return parsed;
+  }
+
+  return 0;
+};
+const hasDisplayablePrice = (product) => resolveDisplayPrice(product) > 0;
+
 // Simple LoginModal Component
 const LoginModal = ({ isOpen, onClose, backgroundLocation }) => {
   if (!isOpen) return null;
@@ -47,63 +77,85 @@ const ProductCard = ({ product }) => {
   const imageUrl = Array.isArray(productImages) && productImages.length > 0 
     ? (typeof productImages[0] === 'string' ? productImages[0] : productImages[0].url || placeholders.productList)
     : getProductImage(product, 'image1');
-  const parseRupeeValue = (value) => {
-    if (typeof value === 'number') return value;
-    if (!value) return 0;
-    const numeric = String(value).replace(/[^0-9.]/g, '');
-    const parsed = Number(numeric);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-  const finalPrice = product.finalPrice || product.price || (() => {
-    const mrp = parseRupeeValue(product.mrp || product.sourceData?.mrp);
-    const discountPercent = product.discountPercent || 0;
-    return Math.round(mrp - (mrp * discountPercent / 100));
+  const finalPrice = resolveDisplayPrice(product);
+  const ratingValue = (() => {
+    const r =
+      product?.rating ??
+      product?.averageRating ??
+      product?.ratingAvg ??
+      product?.ratingsAvg ??
+      product?.product_info?.rating;
+    const n = Number(r);
+    return Number.isFinite(n) && n > 0 ? n : 4.2;
   })();
-  const originalPrice = parseRupeeValue(product.originalPrice || product.mrp || product.price || 0);
-  const discountPercent = product.discountPercent || (originalPrice > finalPrice ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0);
+
+  const brand =
+    product?.product_info?.brand ||
+    product?.brand ||
+    product?.product_info?.manufacturer ||
+    product?.manufacturer ||
+    product?.product_info?.brandName ||
+    'KIDZO';
+
+  const shortDescription = String(
+    product?.shortDescription ||
+      product?.description ||
+      product?.product_info?.shortDescription ||
+      product?.product_info?.description ||
+      ''
+  ).trim();
 
   return (
     <div
       onClick={() => navigate(`/product/${product._id || product.id}`)}
-      className="group bg-white overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-pink-300 transform hover:-translate-y-1"
+      className="group bg-white overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 transform"
     >
       <div className="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden flex items-center justify-center">
         <img
           src={imageUrl}
           alt={product.name || product.title || 'Product'}
-          className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-contain transition-transform duration-300"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = placeholders.productList;
           }}
           loading="lazy"
         />
-        {discountPercent > 0 && (
-          <span className="absolute top-2 right-2 bg-gradient-to-r from-[#8B2BE2] to-[#5c9404] text-white text-xs font-bold px-2 py-1 rounded-md shadow-md uppercase">
-            {discountPercent}% OFF
-          </span>
-        )}
       </div>
       <div className="relative p-4 bg-white">
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B2BE2] via-[#5c9404] to-[#8B2BE2] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-        <h3 className="text-xs font-semibold text-[#5c9404] uppercase tracking-wide line-clamp-1 mb-1">
-          {product.product_info?.manufacturer || product.brand || 'KIDZO'}
-        </h3>
         <p className="text-sm font-bold text-black line-clamp-2 mb-2 min-h-[2.5rem] group-hover:text-[#5c9404] transition-colors">
           {product.name || product.title || 'Untitled Product'}
         </p>
-        <div className="flex items-baseline gap-2">
+
+        <p className="text-xs sm:text-sm text-gray-700/80 line-clamp-2 mb-2 min-h-[1.5rem] transition-colors">
+          {shortDescription || ' '}
+        </p>
+
+        <h3 className="text-xs font-semibold text-[#5c9404] uppercase tracking-wide line-clamp-1 mb-2">
+          {brand}
+        </h3>
+
+        {/* Rating */}
+        <div className="flex items-center gap-2 mb-2">
           <div className="flex items-center">
-            <FaRupeeSign className="h-3 w-3 text-black" />
-            <span className="text-lg font-bold text-black ml-0.5">
-              {Math.round(finalPrice).toLocaleString()}
-            </span>
+            {Array.from({ length: 5 }).map((_, idx) => {
+              const ratingRounded = Math.round(ratingValue);
+              return idx < ratingRounded ? (
+                <FaStar key={idx} className="w-3 h-3 text-amber-500" />
+              ) : (
+                <FaRegStar key={idx} className="w-3 h-3 text-amber-500" />
+              );
+            })}
           </div>
-          {originalPrice > finalPrice && (
-            <span className="text-sm text-gray-400 line-through">
-              ₹{Math.round(originalPrice).toLocaleString()}
-            </span>
-          )}
+          <span className="text-xs font-medium text-gray-700">{ratingValue.toFixed(1)}</span>
+        </div>
+
+        {/* Price (only) */}
+        <div className="mt-3">
+          <span className="text-lg font-bold text-green-600">
+            ₹{Math.round(finalPrice).toLocaleString()}
+          </span>
         </div>
       </div>
     </div>
@@ -262,7 +314,7 @@ const ProductDetail = () => {
       };
 
       const shuffled = shuffleArray(filtered);
-      const selectedProducts = shuffled.slice(0, 10);
+      const selectedProducts = shuffled.filter(hasDisplayablePrice).slice(0, 10);
 
       // Normalize products
       const normalized = selectedProducts.map(p => ({
@@ -272,11 +324,11 @@ const ProductDetail = () => {
         image: Array.isArray(p.images) && p.images.length > 0 
           ? (typeof p.images[0] === 'string' ? p.images[0] : p.images[0].url)
           : p.image || getProductImage(p, 'image1'),
-        price: p.finalPrice || p.price || (p.mrp ? p.mrp - (p.mrp * (p.discountPercent || 0) / 100) : 0),
+        price: resolveDisplayPrice(p),
         originalPrice: p.originalPrice || p.mrp || p.price || 0,
       }));
 
-      setRecommendedProducts(normalized);
+      setRecommendedProducts(normalized.filter((p) => p.price > 0));
     } catch (error) {
       console.error('Error fetching recommended products:', error);
       setRecommendedProducts([]);
@@ -297,7 +349,10 @@ const ProductDetail = () => {
         const { getTrendingProducts } = await import('../services/api');
         const trendingData = await getTrendingProducts(12, 7);
         if (trendingData?.products && trendingData.products.length > 0) {
-          const filtered = trendingData.products.filter(p => (p._id || p.id) !== currentProductId).slice(0, 12);
+          const filtered = trendingData.products
+            .filter(p => (p._id || p.id) !== currentProductId)
+            .filter(hasDisplayablePrice)
+            .slice(0, 12);
           const normalized = filtered.map(p => ({
             ...p,
             id: p._id || p.id,
@@ -305,10 +360,10 @@ const ProductDetail = () => {
             image: Array.isArray(p.images) && p.images.length > 0 
               ? (typeof p.images[0] === 'string' ? p.images[0] : p.images[0].url)
               : p.image || getProductImage(p, 'image1'),
-            price: p.finalPrice || p.price || (p.mrp ? p.mrp - (p.mrp * (p.discountPercent || 0) / 100) : 0),
+            price: resolveDisplayPrice(p),
             originalPrice: p.originalPrice || p.mrp || p.price || 0,
           }));
-          setTrendingProducts(normalized);
+          setTrendingProducts(normalized.filter((p) => p.price > 0));
           setLoadingTrending(false);
           return;
         }
@@ -320,7 +375,10 @@ const ProductDetail = () => {
       const categories = ['kids-clothing', 'kids-accessories', 'footwear'];
       const allProductsPromises = categories.map(cat => fetchSarees(cat).catch(() => []));
       const allProductsArrays = await Promise.all(allProductsPromises);
-      const allProducts = allProductsArrays.flat().filter(p => (p._id || p.id) !== currentProductId);
+      const allProducts = allProductsArrays
+        .flat()
+        .filter(p => (p._id || p.id) !== currentProductId)
+        .filter(hasDisplayablePrice);
 
       // Simple random selection (faster than shuffle)
       const randomProducts = [];
@@ -343,11 +401,11 @@ const ProductDetail = () => {
         image: Array.isArray(p.images) && p.images.length > 0 
           ? (typeof p.images[0] === 'string' ? p.images[0] : p.images[0].url)
           : p.image || getProductImage(p, 'image1'),
-        price: p.finalPrice || p.price || (p.mrp ? p.mrp - (p.mrp * (p.discountPercent || 0) / 100) : 0),
+        price: resolveDisplayPrice(p),
         originalPrice: p.originalPrice || p.mrp || p.price || 0,
       }));
 
-      setTrendingProducts(normalized);
+      setTrendingProducts(normalized.filter((p) => p.price > 0));
     } catch (error) {
       console.error('Error fetching trending products:', error);
       setTrendingProducts([]);
@@ -367,23 +425,24 @@ const ProductDetail = () => {
       const categories = ['kids-clothing', 'kids-accessories', 'footwear'];
       const allProductsPromises = categories.map(cat => fetchSarees(cat).catch(() => []));
       const allProductsArrays = await Promise.all(allProductsPromises);
-      const allProducts = allProductsArrays.flat();
+      const allProducts = allProductsArrays.flat().filter(hasDisplayablePrice);
 
       // Filter products that are on sale (optimized)
       const saleItems = [];
       for (const p of allProducts) {
         const productId = p._id || p.id;
         if (productId === currentProductId) continue;
-        
-        const finalPrice = p.finalPrice || p.price || (p.mrp ? p.mrp - (p.mrp * (p.discountPercent || 0) / 100) : 0);
-        const originalPrice = p.originalPrice || p.mrp || p.price || 0;
-        const hasDiscount = originalPrice > finalPrice;
-        const discountPercent = p.discountPercent || (hasDiscount ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : 0);
-        
-        if (p.onSale === true || hasDiscount || discountPercent > 0) {
+
+        // No discount UI: treat only explicitly `onSale` products as sale items.
+        if (p.onSale === true) {
           saleItems.push(p);
           if (saleItems.length >= 12) break; // Stop early if we have enough
         }
+      }
+
+      // If backend isn't flagging any items as `onSale`, don't block the section.
+      if (saleItems.length === 0) {
+        saleItems.push(...allProducts.filter(p => (p._id || p.id) !== currentProductId).slice(0, 12));
       }
 
       // Simple random selection (faster than shuffle)
@@ -407,11 +466,11 @@ const ProductDetail = () => {
         image: Array.isArray(p.images) && p.images.length > 0 
           ? (typeof p.images[0] === 'string' ? p.images[0] : p.images[0].url)
           : p.image || getProductImage(p, 'image1'),
-        price: p.finalPrice || p.price || (p.mrp ? p.mrp - (p.mrp * (p.discountPercent || 0) / 100) : 0),
+        price: resolveDisplayPrice(p),
         originalPrice: p.originalPrice || p.mrp || p.price || 0,
       }));
 
-      setSaleProducts(normalized);
+      setSaleProducts(normalized.filter((p) => p.price > 0));
     } catch (error) {
       console.error('Error fetching sale products:', error);
       setSaleProducts([]);
@@ -459,13 +518,8 @@ const ProductDetail = () => {
   const currentImage = images[selectedImageIndex] || images[0] || placeholders.productDetail;
   const imageUrl = typeof currentImage === 'string' ? currentImage : (currentImage?.url || placeholders.productDetail);
   
-  const finalPrice = product.finalPrice || product.price || (() => {
-    const mrp = parseRupeeValue(product.mrp || product.sourceData?.mrp);
-    const discountPercent = product.discountPercent || 0;
-    return Math.round(mrp - (mrp * discountPercent / 100));
-  })();
-  const originalPrice = parseRupeeValue(product.originalPrice || product.mrp || product.price || 0);
-  const discountPercent = originalPrice > finalPrice ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100) : (product.discountPercent || 0);
+  // Product pricing: robust fallback across different backend payload shapes.
+  const finalPrice = resolveDisplayPrice(product);
   const productTitle = product.name || product.title || product.sourceData?.skuName || 'Product';
   const productBrand = product.brand || product.product_info?.brand || product.product_info?.manufacturer || '';
   const productDescription = product.description || product.productDetails?.description || '';
@@ -651,60 +705,10 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-3xl font-semibold text-[#212121]">
-                    ₹{Math.round(finalPrice).toLocaleString()}
-                  </span>
-                  {originalPrice > finalPrice && (
-                    <span className="text-base text-[#878787] line-through">
-                      ₹{Math.round(originalPrice).toLocaleString()}
-                    </span>
-                  )}
-                  {discountPercent > 0 && (
-                    <span className="text-base font-semibold text-[#388e3c]">
-                      {discountPercent}% off
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-col items-end">
-                  <button
-                    type="button"
-                    onClick={handleWishlistToggle}
-                    disabled={wishlistPending}
-                    aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                    className={`shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-full border transition-all ${
-                      wishlisted
-                        ? 'border-pink-200 bg-pink-50 hover:bg-pink-100 text-[#E91E63]'
-                        : 'border-gray-200 bg-white hover:bg-gray-50 text-black'
-                    } ${wishlistPending ? 'opacity-70 cursor-not-allowed' : ''}`}
-                    title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                  >
-                    {wishlistPending ? (
-                      <FaSpinner className="animate-spin" />
-                    ) : wishlisted ? (
-                      <FaHeart className="text-lg" />
-                    ) : (
-                      <FaRegHeart className="text-lg" />
-                    )}
-                  </button>
-
-                  {wishlistError && (
-                    <p className="text-xs text-red-600 mt-1 leading-tight max-w-[220px] text-right">
-                      {wishlistError}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="border border-[#f0f0f0] rounded-sm p-3 bg-[#fcfcfc]">
-                <h3 className="text-sm font-semibold text-[#212121] mb-2">Available offers</h3>
-                <ul className="space-y-1.5 text-sm text-[#212121]">
-                  <li><span className="font-medium">Bank Offer</span> 10% Instant Discount on select cards</li>
-                  <li><span className="font-medium">Special Price</span> Extra discount on combo orders</li>
-                  <li><span className="font-medium">Free Delivery</span> for orders above ₹1,000</li>
-                </ul>
+              <div className="flex items-center gap-2">
+                <span className="text-3xl font-semibold text-green-600">
+                  ₹{Math.round(finalPrice).toLocaleString()}
+                </span>
               </div>
 
               <div className="grid sm:grid-cols-[120px_1fr] gap-2 items-center">

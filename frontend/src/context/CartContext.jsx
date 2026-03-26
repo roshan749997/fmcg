@@ -37,9 +37,8 @@ export const CartProvider = ({ children }) => {
       });
       
       const normalizedMrp = typeof p.mrp === 'number' ? p.mrp : parseRupeeToNumber(p.MRP);
-      const price = typeof p.price === 'number'
-        ? p.price
-        : (normalizedMrp > 0 ? Math.round(normalizedMrp - (normalizedMrp * (p.discountPercent || 0) / 100)) : 0);
+      // No % discount: use server `price` if present, otherwise plain MRP.
+      const price = typeof p.price === 'number' ? p.price : normalizedMrp > 0 ? Math.round(normalizedMrp) : 0;
       
       // Get image URL - prefer image1, fallback to image2, image3, or legacy image field
       let imageUrl = null;

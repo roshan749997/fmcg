@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTruck, FaAward, FaShieldAlt, FaUndo } from 'react-icons/fa';
 
 const KidzoSections = () => {
   const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   // Click Handler Function
   const handleCategoryClick = (path) => {
@@ -83,17 +82,33 @@ const KidzoSections = () => {
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
-          <div className="text-center mb-2 sm:mb-3 md:mb-4 px-2 sm:px-4">
-            <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-0 sm:mb-1 uppercase" 
-              style={{ 
-                fontFamily: "'Bebas Neue', sans-serif", 
-                letterSpacing: '2px', 
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)' 
-              }}
-            >
-              SHOP BY CATEGORY
-            </h2>
+          <div className="mb-2 sm:mb-3 md:mb-4 px-2 sm:px-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1 border border-red-200 bg-white">
+                  <span className="relative w-2.5 h-2.5 inline-block rounded-full bg-red-500">
+                    <span className="absolute inset-0 rounded-full bg-red-500 opacity-25 animate-ping" />
+                  </span>
+                  <span className="text-xs font-bold tracking-wide text-red-600">DISCOVER</span>
+                </div>
+
+                <h2
+                  className="mt-2 text-2xl md:text-xl lg:text-4xl font-extrabold text-black leading-tight"
+                  style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    letterSpacing: '1px',
+                  }}
+                >
+                  Shop by <span className="text-red-600">Category</span>
+                </h2>
+
+                <p className="mt-1 text-xs sm:text-sm md:text-base tracking-wider font-semibold text-gray-600 pb-3">
+                  CURATED PICKS FOR YOUR STYLE
+                </p>
+              </div>
+
+              
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 lg:gap-5 px-2 sm:px-4">
             {categories.map((category, index) => (
@@ -301,22 +316,15 @@ const KidzoSections = () => {
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
             <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase" 
+              className="text-xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase" 
               style={{ 
                 fontFamily: "'Bebas Neue', sans-serif", 
                 letterSpacing: '2px', 
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)' 
               }}
             >
-              SPECIAL COLLECTION
+              SHOP BY CATEGORY
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base mt-2">Discover our exclusive range of premium products</p>
-            <button
-              onClick={() => handleCategoryClick('/category/kids-accessories')}
-              className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              Explore Collection →
-            </button>
           </div>
 
           <div className="w-full px-2 sm:px-4">
