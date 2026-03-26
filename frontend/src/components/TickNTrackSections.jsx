@@ -17,7 +17,7 @@ const KidzoSections = () => {
       { 
         name: 'Makeup', 
         icon: '🚴‍♂️', 
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774432684/6ac06970-96fc-482a-94e7-babf1d959fdc.png', 
+        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774528869/a8c0009f-b9a6-483a-aa83-16cdcc6d1e01.png', 
         path: '/category/beauty-and-hygiene/makeup' 
       },
       { 
