@@ -249,13 +249,13 @@ const KidzoSections = () => {
 
     return (
       <section 
-        className="py-6 sm:py-8 md:py-10 lg:py-12 px-1 sm:px-2 md:px-3 lg:px-4 w-full" 
+        className="py-6 sm:py-8 md:py-10 lg:py-12 px-2 sm:px-3 md:px-4 lg:px-5 w-full" 
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
           <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 px-2 sm:px-4">
             <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-center mb-2 sm:mb-3 text-black overflow-hidden uppercase" 
+              className="text-[1.6rem] sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-center mb-2 sm:mb-3 text-black overflow-hidden uppercase leading-none" 
               style={{ 
                 fontFamily: "'Bebas Neue', sans-serif", 
                 letterSpacing: '2px', 
@@ -269,12 +269,12 @@ const KidzoSections = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 w-full px-2 sm:px-3 md:px-4">
+          <div className="grid grid-cols-1 min-[430px]:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 w-full px-1 sm:px-2 md:px-3">
             {productData.map((product, index) => (
               <div
                 key={index}
                 onClick={() => handleCategoryClick(product.path)}
-                className={`group relative overflow-hidden rounded-xl sm:rounded-2xl ${product.bgTint} shadow-md hover:shadow-2xl transition-all duration-300 w-full cursor-pointer border border-gray-100 hover:-translate-y-1`}
+                className={`group relative overflow-hidden rounded-2xl ${product.bgTint} transition-all duration-300 w-full cursor-pointer border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1`}
               >
                 <div className="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden">
                   <img
@@ -300,14 +300,17 @@ const KidzoSections = () => {
                   </div>
                 </div>
                 <div className={`px-3 py-3 sm:px-4 sm:py-4 ${product.bgTint}`}>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed min-h-[36px] sm:min-h-[40px]">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed min-h-[34px] sm:min-h-[40px]">
                     {product.description}
                   </p>
                   <div className="mt-3">
-                    <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-white bg-slate-700">
+                    <button
+                      type="button"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-[12px] sm:text-sm font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-900 hover:to-slate-800 active:scale-[0.98] transition-all duration-200 shadow-md group-hover:shadow-lg"
+                    >
                       {product.cta}
-                      <span aria-hidden="true">{'->'}</span>
-                    </span>
+                      <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">{'->'}</span>
+                    </button>
                   </div>
                 </div>
               </div>

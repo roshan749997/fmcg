@@ -281,8 +281,17 @@ const Navbar = () => {
       const inDesktop = searchWrapRefDesktop.current && searchWrapRefDesktop.current.contains(e.target);
       if (!inDesktop) setSearchOpen(false);
     };
+    const onEscape = (e) => {
+      if (e.key === 'Escape') setSearchOpen(false);
+    };
     document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
+    document.addEventListener('touchstart', onClick);
+    document.addEventListener('keydown', onEscape);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('touchstart', onClick);
+      document.removeEventListener('keydown', onEscape);
+    };
   }, []);
 
   // Categories with subcategories
@@ -316,11 +325,11 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`relative z-[70] w-full bg-white border-b border-gray-200 transition-shadow duration-200 ${isScrolled ? 'shadow-sm' : ''}`}>
+    <nav className={`sticky top-0 z-[70] w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-shadow duration-200 ${isScrolled ? 'shadow-md' : 'shadow-sm'}`}>
       {/* Bottom Bar - Clean white background with Logo, Navigation, and Icons */}
       <div className="w-full">
-        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 xl:px-4 2xl:px-6">
-          <div className="flex items-center justify-between h-12 sm:h-14 md:h-16">
+        <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo/Brand - Left */}
             <Link to="/" className="flex-shrink-0">
               <img 
@@ -333,7 +342,7 @@ const Navbar = () => {
                   objectFit: 'contain',
                 }}
                 className={headerLogo.width === 'auto' && headerLogo.height === 'auto' 
-                  ? "h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain" 
+                  ? "h-9 sm:h-10 md:h-12 lg:h-14 w-auto object-contain" 
                   : "object-contain"}
                 onError={(e) => {
                   e.target.src = 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521755/Untitled_1500_x_500_px_1_t89yk3.png';
@@ -342,7 +351,7 @@ const Navbar = () => {
             </Link>
 
             {/* Navigation Menu - Center (Desktop) with Categories */}
-            <div className="hidden md:flex items-center justify-center flex-1 space-x-3 lg:space-x-5" ref={categoryRef}>
+            <div className="hidden md:flex items-center justify-center flex-1 gap-1.5 lg:gap-2" ref={categoryRef}>
               {categories.map((category) => (
                 <div
                   key={category.name}
@@ -371,8 +380,8 @@ const Navbar = () => {
                 }}
                 >
                   <div
-                    className={`flex items-center font-semibold text-[11px] sm:text-sm tracking-wide transition-all duration-200 cursor-pointer whitespace-nowrap px-1.5 sm:px-2 py-1 rounded-md hover:bg-gray-50 active:bg-gray-100 touch-manipulation text-black ${
-                      activeCategory === category.name ? 'bg-gray-50' : ''
+                    className={`flex items-center font-medium text-[13px] lg:text-sm tracking-normal transition-all duration-200 cursor-pointer whitespace-nowrap px-3 py-1.5 rounded-full hover:bg-gray-100 active:bg-gray-100 touch-manipulation text-gray-700 hover:text-black ${
+                      activeCategory === category.name ? 'bg-gray-900 text-white hover:bg-gray-900 hover:text-white' : ''
                     }`}
                     onClick={() => {
                       // If category has subcategories, toggle dropdown; otherwise navigate directly
@@ -403,12 +412,12 @@ const Navbar = () => {
                   {/* Simple Attractive Dropdown */}
                   {activeCategory === category.name && category.subcategories && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 sm:mt-3 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <div className="bg-white rounded-xl shadow-md ring-1 ring-gray-200 border border-gray-100 overflow-hidden w-56 sm:w-64 min-w-[200px] sm:min-w-[220px]">
+                      <div className="bg-white/95 backdrop-blur rounded-2xl shadow-[0_18px_45px_rgba(2,6,23,0.16)] ring-1 ring-gray-200/80 border border-gray-100 overflow-hidden w-60 sm:w-72 min-w-[220px] sm:min-w-[250px]">
                         {/* Header */}
-                        <div className="bg-gray-50 border-b border-gray-200">
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                           <button
                             type="button"
-                            className="w-full text-left block px-3 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold transition-colors duration-150 flex items-center gap-2 group touch-manipulation active:bg-gray-100 hover:bg-gray-100 text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                            className="w-full text-left block px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold transition-colors duration-150 flex items-center gap-2 group touch-manipulation active:bg-gray-100 hover:bg-gray-100 text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -417,16 +426,19 @@ const Navbar = () => {
                             }}
                           >
                             <span className="tracking-wide">All {category.name}</span>
+                            <svg className="w-4 h-4 ml-auto text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
                           </button>
                         </div>
                         
                         {/* Subcategories */}
-                        <div className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto custom-scrollbar py-1 sm:py-2 divide-y divide-gray-100">
+                        <div className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto custom-scrollbar py-1.5 sm:py-2">
                           {category.subcategories.map((subcategory) => (
                             <button
                               key={subcategory.name}
                               type="button"
-                              className="w-full text-left flex items-center justify-between gap-3 px-3 sm:px-5 py-2.5 sm:py-3 text-sm transition-colors duration-150 hover:bg-gray-50 active:bg-gray-100 group touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                              className="w-full text-left flex items-center justify-between gap-3 px-4 sm:px-5 py-2.5 sm:py-3 text-sm transition-all duration-150 hover:bg-gray-50 active:bg-gray-100 group touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -434,13 +446,12 @@ const Navbar = () => {
                                 navigate(subcategory.path);
                               }}
                             >
-                              <span
-                                className="font-medium text-gray-900"
-                              >
+                              <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-gray-700 transition-colors"></span>
+                              <span className="font-medium text-gray-900 flex-1">
                                 {subcategory.name}
                               </span>
                               <svg
-                                className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-gray-400 group-hover:text-gray-600 flex-shrink-0"
+                                className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-gray-400 group-hover:text-gray-700 flex-shrink-0"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -458,12 +469,12 @@ const Navbar = () => {
             </div>
 
             {/* Icons - Right (Search, Cart on Mobile; All icons on Desktop) */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 ml-auto md:ml-0">
+            <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-2.5 ml-auto md:ml-0">
               {/* Search Icon - Always Visible */}
               <div className="relative" ref={searchWrapRefDesktop}>
                 <button
                   onClick={() => setSearchOpen(!searchOpen)}
-                  className="p-1.5 sm:p-2 md:p-2.5 rounded-lg bg-white hover:bg-gray-50 text-gray-900 transition-colors duration-150 group touch-manipulation border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  className="p-2 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-800 transition-colors duration-150 group touch-manipulation border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                   aria-label="Search"
                 >
                   <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
@@ -472,7 +483,7 @@ const Navbar = () => {
                 </button>
                 {/* Search Dropdown */}
                 {searchOpen && (
-                  <div className="fixed md:absolute right-2 sm:right-4 md:right-0 left-2 sm:left-4 md:left-auto top-[calc(var(--app-header-height,48px)+0.5rem)] sm:top-[calc(var(--app-header-height,56px)+0.5rem)] md:top-full mt-0 md:mt-2 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] md:w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-[80]">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[min(78vw,20rem)] sm:w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-[80]">
                     <div className="p-2 sm:p-3">
                       <input
                         type="text"
@@ -524,7 +535,7 @@ const Navbar = () => {
               </div>
 
               {/* Wishlist Icon - Hidden on Mobile, Visible on Desktop */}
-              <Link to="/wishlist" className="hidden md:flex p-1.5 sm:p-2 md:p-2.5 rounded-lg bg-white hover:bg-gray-50 text-gray-900 relative transition-colors duration-150 group touch-manipulation border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+              <Link to="/wishlist" className="hidden md:flex p-2 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-800 relative transition-colors duration-150 group touch-manipulation border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
                 <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
@@ -536,7 +547,7 @@ const Navbar = () => {
               </Link>
 
               {/* Cart Icon - Always Visible */}
-              <Link to="/cart" className="p-1.5 sm:p-2 md:p-2.5 rounded-lg bg-white hover:bg-gray-50 text-gray-900 relative transition-colors duration-150 group touch-manipulation border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+              <Link to="/cart" className="p-2 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-800 relative transition-colors duration-150 group touch-manipulation border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
                 <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.25 10.5a.75.75 0 01-.75.75H5.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zm6.75 0a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75z" />
                 </svg>
@@ -550,7 +561,7 @@ const Navbar = () => {
               {/* Wishlist Icon - Always Visible */}
               <NavLink
                 to="/wishlist"
-                className="p-1.5 sm:p-2 md:p-2.5 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 hover:text-pink-700 relative transition-all duration-200 hover:scale-110 group touch-manipulation"
+                className="hidden"
               >
                 <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -566,7 +577,7 @@ const Navbar = () => {
               {isAuthenticated && userInitial ? (
                 <Link 
                   to="/profile" 
-                  className="hidden md:flex w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-gray-900 text-white font-bold text-sm sm:text-base md:text-lg items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-150 group touch-manipulation ring-1 ring-gray-200 hover:ring-gray-300 overflow-hidden border border-gray-200"
+                  className="hidden md:flex w-9 h-9 md:w-10 md:h-10 rounded-full bg-gray-900 text-white font-bold text-sm md:text-base items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-150 group touch-manipulation ring-1 ring-gray-200 hover:ring-gray-300 overflow-hidden border border-gray-200"
                   title="My Profile"
                 >
                   {userAvatar && !avatarError ? (
@@ -583,7 +594,7 @@ const Navbar = () => {
               ) : (
                 <button 
                   onClick={handleLogin} 
-                  className="hidden md:flex p-1.5 sm:p-2 md:p-2.5 rounded-lg bg-white hover:bg-gray-50 text-gray-900 transition-colors duration-150 group touch-manipulation items-center justify-center border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  className="hidden md:flex p-2 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-800 transition-colors duration-150 group touch-manipulation items-center justify-center border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                   aria-label="Sign In"
                 >
                   <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
@@ -601,7 +612,7 @@ const Navbar = () => {
                   setIsMobileMenuOpen(next);
                   if (!next) setMobileCategoryOpen(null);
                 }}
-                className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none touch-manipulation active:bg-gray-100"
+                className="inline-flex items-center justify-center p-2 rounded-full text-gray-800 hover:text-black bg-gray-50 hover:bg-gray-100 border border-gray-200 focus:outline-none touch-manipulation active:bg-gray-100"
                 aria-expanded="false"
                 aria-label="Toggle menu"
               >
