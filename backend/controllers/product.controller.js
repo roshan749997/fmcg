@@ -100,7 +100,8 @@ export const getProducts = async (req, res) => {
     }
 
     const query = andConditions.length > 0 ? { $and: andConditions } : {};
-    let products = await Product.find(query).sort({ createdAt: -1 });
+    // Use _id sort (indexed by default) to avoid in-memory sort limit errors.
+    let products = await Product.find(query).sort({ _id: -1 });
 
     // Fallback for manually inserted raw dataset docs:
     // if strict 3-level match returns no rows, try relaxed leaf match.
@@ -116,7 +117,7 @@ export const getProducts = async (req, res) => {
           { title: { $regex: leafRegex } },
           { 'SKU Name': { $regex: leafRegex } },
         ],
-      }).sort({ createdAt: -1 });
+      }).sort({ _id: -1 });
     }
 
     // Native Mongo fallback for raw-key docs inserted directly via Compass.
@@ -128,7 +129,7 @@ export const getProducts = async (req, res) => {
       if (subCategoryLooseRe) rawAnd.push({ 'Sub-sub-Category': { $regex: subCategoryLooseRe } });
 
       const rawQuery = rawAnd.length > 0 ? { $and: rawAnd } : {};
-      const rawDocs = await Product.collection.find(rawQuery).sort({ createdAt: -1 }).toArray();
+      const rawDocs = await Product.collection.find(rawQuery).sort({ _id: -1 }).toArray();
       products = rawDocs;
     }
 

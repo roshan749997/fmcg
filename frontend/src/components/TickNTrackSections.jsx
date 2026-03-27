@@ -142,66 +142,61 @@ const KidzoSections = () => {
     );
   };
 
-  // Offer Zone Section
+
+  // Best Sellers Section
   const FeaturedSection = () => {
-    const offers = [
-      {
-        id: 1,
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421048/58017a7a-e5b0-451f-a5e3-4cfeaf120849.png',
-        path: '/category/baby-care'
-      },
-      {
-        id: 2,
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421025/94c73c6e-e976-429e-962a-995e249ce108.png',
-        path: '/category/beverages/energy-and-soft-drinks'
-      },
-      {
-        id: 3,
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421010/cad31fe6-8aac-41dd-974d-2fa7f3e615d2.png',
-        path: '/category/snacks-and-branded-foods/biscuits-and-cookies'
-      },
-      {
-        id: 4,
-        image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774523448/b5bc93ec-e125-4e6f-9415-043b96835fbe.png',
-        path: '/category/beauty-and-hygiene'
-      }
+    const bestSellers = [
+      { id: 1, name: 'Lakme Face Wash', price: 249, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521094/0dbfe300-b764-4e49-a966-fcf5a9df5b7b.png', path: '/category/beauty-and-hygiene/makeup' },
+      { id: 2, name: 'Red Bull Energy Drink', price: 125, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521771/70ff75c5-db6d-4658-97f8-53d7853c751a.png', path: '/category/beverages/energy-and-soft-drinks' },
+      { id: 3, name: 'Dettol Hand Wash', price: 179, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774522325/d5982c91-6ce8-416d-80d9-eeab59e7d7de.png', path: '/category/beauty-and-hygiene/bath-and-hand-wash' },
+      { id: 4, name: 'Premium Assam Tea', price: 299, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774522493/70425225-2906-4dba-a9a1-9e0b857c7a63.png', path: '/category/beverages/tea' },
+      { id: 5, name: 'Gillette Grooming Kit', price: 499, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421048/58017a7a-e5b0-451f-a5e3-4cfeaf120849.png', path: '/category/beauty-and-hygiene/mens-grooming' },
+      { id: 6, name: 'L Oreal Hair Serum', price: 399, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421025/94c73c6e-e976-429e-962a-995e249ce108.png', path: '/category/beauty-and-hygiene/hair-care' },
+      { id: 7, name: 'Wild Stone Deo', price: 210, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774421010/cad31fe6-8aac-41dd-974d-2fa7f3e615d2.png', path: '/category/beauty-and-hygiene/fragrances-and-deos' },
+      { id: 8, name: 'Colin Glass Cleaner', price: 145, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774523448/b5bc93ec-e125-4e6f-9415-043b96835fbe.png', path: '/category/cleaning-and-household/sports-and-fitness' },
+      { id: 9, name: 'Fun Toy Combo', price: 349, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774521771/70ff75c5-db6d-4658-97f8-53d7853c751a.png', path: '/category/cleaning-and-household/toys-and-games' },
+      { id: 10, name: 'Bathroom Bin Set', price: 289, image: 'https://res.cloudinary.com/dzd47mpdo/image/upload/v1774522325/d5982c91-6ce8-416d-80d9-eeab59e7d7de.png', path: '/category/cleaning-and-household/bins-and-bathroom-ware' },
     ];
 
     return (
-      <section 
-        className="pt-4 pb-6 sm:pt-4 sm:pb-7 md:pt-5 md:pb-8 lg:pt-6 lg:pb-10 px-2 sm:px-4 md:px-6 lg:px-8 w-full"
-        style={{ backgroundColor: '#FFFFFF' }}
-      >
+      <section className="pt-4 pb-8 sm:pb-10 md:pb-12 px-2 sm:px-4 md:px-6 lg:px-8 w-full bg-white">
         <div className="w-full">
-          <div className="text-center mb-2 sm:mb-3 md:mb-4 px-2 sm:px-4">
+          <div className="text-center mb-4 sm:mb-6 px-2 sm:px-4">
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-0 sm:mb-1 uppercase"
-              style={{
-                fontFamily: "'Bebas Neue', sans-serif",
-                letterSpacing: '2px',
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              }}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-1 uppercase"
+              style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '2px' }}
             >
-              OFFER ZONE
+              BEST SELLERS
             </h2>
+            <p className="text-gray-600 text-xs sm:text-sm md:text-base">Top selling products picked for you</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 px-2 sm:px-4">
-            {offers.map((offer) => (
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
+            {bestSellers.map((item) => (
               <div
-                key={offer.id}
-                onClick={() => handleCategoryClick(offer.path)}
-                className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] group cursor-pointer"
+                key={item.id}
+                onClick={() => handleCategoryClick(item.path)}
+                className="group cursor-pointer rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
               >
-                <div className="absolute top-4 right-4 w-20 h-20 bg-white/10 rounded-full"></div>
-                <img
-                  src={offer.image}
-                  alt=""
-                  className="w-full h-full object-cover transition-transform duration-300 transform group-hover:scale-[1.03]"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/600/1F2937/FFFFFF?text=Offer';
-                  }}
-                />
+                <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/300x300/1F2937/FFFFFF?text=Product';
+                    }}
+                  />
+                  <span className="absolute top-2 left-2 inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold text-white bg-[#5c9404] shadow">
+                    Best Seller
+                  </span>
+                </div>
+                <div className="p-2.5 sm:p-3">
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight line-clamp-1">{item.name}</h3>
+                  <p className="text-xs sm:text-sm font-bold text-[#15803d] mt-1">₹{item.price.toLocaleString()}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -477,29 +472,22 @@ const KidzoSections = () => {
   // Promotional Banners Section
   const PromotionalBanners = () => {
     return (
-      <section 
-        className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
-        style={{ backgroundColor: '#FFFFFF' }}
-      >
+      <section className="py-10 sm:py-12 md:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full bg-white">
         <div className="w-full">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4">
-            <h2 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase" 
-              style={{ 
-                fontFamily: "'Bebas Neue', sans-serif", 
-                letterSpacing: '2px', 
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)' 
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-2 sm:mb-3 uppercase"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                letterSpacing: '2px',
+                textShadow: '0 2px 4px rgba(0,0,0,0.08)',
               }}
             >
-              SPECIAL OFFERS
+              CLIENT REVIEWS
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base mt-2">Check out our latest promotions and deals</p>
-            <button
-              onClick={() => handleCategoryClick('/category/toys')}
-              className="mt-4 px-6 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              View All Deals →
-            </button>
+            <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto">
+              Real feedback from our happy customers across India.
+            </p>
           </div>
 
           {/* Mobile Only Banner */}
