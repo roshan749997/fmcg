@@ -274,7 +274,7 @@ const KidzoSections = () => {
               <div
                 key={index}
                 onClick={() => handleCategoryClick(product.path)}
-                className={`group relative overflow-hidden rounded-2xl ${product.bgTint} transition-all duration-300 w-full cursor-pointer border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1`}
+                className={`group relative overflow-hidden rounded-xl ${product.bgTint} transition-all duration-300 w-full cursor-pointer border border-gray-200 shadow-sm`}
               >
                 <div className="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden">
                   <img
@@ -309,7 +309,7 @@ const KidzoSections = () => {
                       className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-[12px] sm:text-sm font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-900 hover:to-slate-800 active:scale-[0.98] transition-all duration-200 shadow-md group-hover:shadow-lg"
                     >
                       {product.cta}
-                      <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">{'->'}</span>
+                      <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">{''}</span>
                     </button>
                   </div>
                 </div>
