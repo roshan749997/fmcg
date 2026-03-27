@@ -350,7 +350,7 @@ const KidzoSections = () => {
             >
               <div className="w-full">
                 <img
-                  src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765548837/Beige_Kids_Fashion_Sale_Ad_Instagram_Story_gwokfq.svg"
+                  src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1774591555/banner-fmcg-2_sidqv8.jpg"
                   alt="Special Collection Banner"
                   className="w-full h-auto object-cover"
                   onError={(e) => {
@@ -367,7 +367,7 @@ const KidzoSections = () => {
             >
               <div className="w-full">
               <img 
-                  src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765541014/White_and_Pink_Fashion_Kids_Edition_Banner_1920_x_600_mm_jpmhbs.svg"
+                  src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1774591555/banner-fmcg-2_sidqv8.jpg"
                   alt="Special Collection Banner"
                 className="w-full h-auto object-cover"
                   onError={(e) => {
@@ -476,21 +476,6 @@ const KidzoSections = () => {
 
   // Promotional Banners Section
   const PromotionalBanners = () => {
-    const banners = [
-      {
-        id: 1,
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765610052/Pink_and_Yellow_Playful_Kids_Fashion_Sale_Promotion_Landscape_Banner_dl4a3a.svg',
-        alt: 'Pink and Yellow Kids Fashion Sale Promotion',
-        path: '/category/kids-clothing'
-      },
-      {
-        id: 2,
-        image: 'https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765610311/Colorful_Kids_Fashion_Tips_YouTube_Thumbnail_wfyxyn.svg',
-        alt: 'Green and Pink Modern Gradient Summer Kids Fashion Banner',
-        path: '/category/footwear'
-      }
-    ];
-
     return (
       <section 
         className="py-8 sm:py-10 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
@@ -525,7 +510,7 @@ const KidzoSections = () => {
             >
               <div className="w-full aspect-[4/5] bg-gray-100 overflow-hidden">
                 <img
-                  src="https://res.cloudinary.com/dvkxgrcbv/image/upload/v1765534235/Blue_Pink_and_White_Modern_Kids_Fashion_Instagram_Post_iye3ee.png"
+                  src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1774591242/ca2e5e7b-927f-4410-ab84-d1cce994652f.png"
                   alt="Special Offers Mobile Banner"
                   className="w-full h-full object-cover"
                   loading="lazy"
@@ -538,29 +523,45 @@ const KidzoSections = () => {
             </div>
           </div>
 
-          {/* Desktop Banners - Hidden on Mobile */}
+          {/* Desktop Two Banners - Hidden on Mobile */}
           <div className="hidden md:grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 px-2 sm:px-4">
-            {banners.map((banner) => (
-              <div
-                key={banner.id}
-                onClick={() => handleCategoryClick(banner.path)}
-                className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] group cursor-pointer"
-              >
-                <div className="w-full aspect-[4/3] sm:aspect-[3/2] md:aspect-[2/1] bg-gray-100 overflow-hidden">
-                  <img
-                    src={banner.image}
-                    alt={banner.alt}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/800x400/E6D9F2/000000?text=Banner';
-                    }}
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div
+              onClick={() => handleCategoryClick('/category/toys')}
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01] group cursor-pointer"
+            >
+              <div className="w-full aspect-[4/3] sm:aspect-[3/2] md:aspect-[2/1] bg-gray-100 overflow-hidden">
+                <img
+                  src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1774591277/94dae241-59e4-4948-8687-7e72c26a102f.png"
+                  alt="Special Offers Desktop Banner 1"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/1200x500/E6D9F2/000000?text=Banner';
+                  }}
+                />
               </div>
-            ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+
+            <div
+              onClick={() => handleCategoryClick('/category/toys')}
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01] group cursor-pointer"
+            >
+              <div className="w-full aspect-[4/3] sm:aspect-[3/2] md:aspect-[2/1] bg-gray-100 overflow-hidden">
+                <img
+                  src="https://res.cloudinary.com/dzd47mpdo/image/upload/v1774591242/ca2e5e7b-927f-4410-ab84-d1cce994652f.png"
+                  alt="Special Offers Desktop Banner 2"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/1200x500/E6D9F2/000000?text=Banner';
+                  }}
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
           </div>
         </div>
       </section>
