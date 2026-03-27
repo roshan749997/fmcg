@@ -478,7 +478,7 @@ const KidzoSections = () => {
 
     return (
       <section 
-        className="py-12 sm:py-16 md:py-20 lg:py-24 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
+        className="pt-4 pb-12 sm:pt-6 sm:pb-16 md:pt-8 md:pb-20 lg:pt-10 lg:pb-24 px-2 sm:px-4 md:px-6 lg:px-8 w-full" 
         style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="w-full">
