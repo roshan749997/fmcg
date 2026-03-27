@@ -318,7 +318,7 @@ const KidzoSections = () => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 min-[430px]:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 w-full px-1 sm:px-2 md:px-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6 w-full px-1 sm:px-2 md:px-3">
             {productData.map((product, index) => (
               <div
                 key={index}
